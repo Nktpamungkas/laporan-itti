@@ -128,7 +128,10 @@
                                                                                                         SUM(QTY_SUDAH_KIRIM_2) AS QTY_SUDAH_KIRIM_2,
                                                                                                         SUM(QTY_READY) AS QTY_READY,
                                                                                                         SUM(QTY_READY2) AS QTY_READY2,
-                                                                                                        DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD')) AS DELAY
+                                                                                                        CASE
+                                                                                                            WHEN DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD')) < 0 THEN 0
+                                                                                                            ELSE DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD'))
+                                                                                                        END	AS DELAY
                                                                                                     FROM
                                                                                                         ITXVIEW_SUMMARY_QTY_DELIVERY isqd
                                                                                                     WHERE
@@ -161,7 +164,7 @@
                                                             <td><?= $dt_sum['STYLE']; ?></td>
                                                             <td align="center"><?= number_format($dt_sum['LEBAR'], 0); ?></td>
                                                             <td align="center"><?= number_format($dt_sum['GRAMASI'], 0); ?></td>
-                                                            <td><?= $dt_sum['WARNA']; ?></td>
+                                                            <td><a target="_blank" href="ppc_filter_poselesai_summary_detail.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><?= $dt_sum['WARNA']; ?></a></td>
                                                             <td><?= $dt_sum['NO_WARNA']; ?></td>
                                                             <td><?= $dt_sum['ACTUAL_DELIVERY']; ?></td>
                                                             <td align="right"><?= $dt_sum['NETTO']; ?></td>
