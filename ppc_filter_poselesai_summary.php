@@ -102,16 +102,16 @@
                                                             require_once "koneksi.php";
 
                                                             if($_POST['no_order'] AND $_POST['no_po']){
-                                                                $where_no_order_po     = "isqd.NO_ORDER = '$_POST[no_order]' AND NO_PO = '$_POST[no_po]'";
+                                                                $where_no_order_po     = "NO_ORDER = '$_POST[no_order]' AND NO_PO = '$_POST[no_po]'";
                                                             }elseif($_POST['no_order'] AND empty($_POST['no_po'])){
-                                                                $where_no_order_po     = "isqd.NO_ORDER = '$_POST[no_order]'";
+                                                                $where_no_order_po     = "NO_ORDER = '$_POST[no_order]'";
                                                             }elseif(empty($_POST['no_order']) AND ($_POST['no_po'])){
                                                                 $where_no_order_po     = "NO_PO = '$_POST[no_po]'";
                                                             }else{
                                                                 $where_no_order_po     = "";
                                                             }
 
-                                                            $q_sum_po_selesai   = db2_exec($conn1, "SELECT
+                                                            $q_sum_po_selesai   = db2_exec($conn1, "SELECT 
                                                                                                         ORDERLINE,
                                                                                                         PELANGGAN,
                                                                                                         NO_ORDER,
@@ -121,7 +121,7 @@
                                                                                                         LEBAR,
                                                                                                         GRAMASI,
                                                                                                         WARNA,
-	                                                                                                    NO_WARNA,
+                                                                                                        NO_WARNA,
                                                                                                         NETTO,
                                                                                                         NETTO_2,
                                                                                                         KONVERSI,
@@ -130,6 +130,30 @@
                                                                                                         SUM(QTY_SUDAH_KIRIM_2) AS QTY_SUDAH_KIRIM_2,
                                                                                                         SUM(QTY_READY) AS QTY_READY,
                                                                                                         SUM(QTY_READY2) AS QTY_READY2,
+                                                                                                        CASE
+                                                                                                            WHEN DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD')) < 0 THEN 0
+                                                                                                            ELSE DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD'))
+                                                                                                        END	AS DELAY
+                                                                                                    FROM 
+                                                                                                    (SELECT
+                                                                                                        ORDERLINE,
+                                                                                                        PELANGGAN,
+                                                                                                        NO_ORDER,
+                                                                                                        NO_PO,
+                                                                                                        KET_PRODUCT,
+                                                                                                        STYLE,
+                                                                                                        LEBAR,
+                                                                                                        GRAMASI,
+                                                                                                        WARNA,
+                                                                                                        NO_WARNA,
+                                                                                                        NETTO,
+                                                                                                        NETTO_2,
+                                                                                                        KONVERSI,
+                                                                                                        ACTUAL_DELIVERY,
+                                                                                                        (QTY_SUDAH_KIRIM) AS QTY_SUDAH_KIRIM,
+                                                                                                        (QTY_SUDAH_KIRIM_2) AS QTY_SUDAH_KIRIM_2,
+                                                                                                        (QTY_READY) AS QTY_READY,
+                                                                                                        (QTY_READY2) AS QTY_READY2,
                                                                                                         CASE
                                                                                                             WHEN DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD')) < 0 THEN 0
                                                                                                             ELSE DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD'))
@@ -148,14 +172,33 @@
                                                                                                         LEBAR,
                                                                                                         GRAMASI,
                                                                                                         WARNA,
-	                                                                                                    NO_WARNA,
+                                                                                                        NO_WARNA,
                                                                                                         NETTO,
                                                                                                         NETTO_2,
                                                                                                         KONVERSI,
-                                                                                                        ACTUAL_DELIVERY
+                                                                                                        ACTUAL_DELIVERY,
+                                                                                                        QTY_SUDAH_KIRIM,
+                                                                                                        QTY_SUDAH_KIRIM_2,
+                                                                                                        QTY_READY,
+                                                                                                        QTY_READY2
                                                                                                     ORDER BY
                                                                                                         ORDERLINE 
-                                                                                                    ASC");
+                                                                                                    ASC)
+                                                                                                    GROUP BY
+                                                                                                        ORDERLINE,
+                                                                                                        PELANGGAN,
+                                                                                                        NO_ORDER,
+                                                                                                        NO_PO,
+                                                                                                        KET_PRODUCT,
+                                                                                                        STYLE,
+                                                                                                        LEBAR,
+                                                                                                        GRAMASI,
+                                                                                                        WARNA,
+                                                                                                        NO_WARNA,
+                                                                                                        NETTO,
+                                                                                                        NETTO_2,
+                                                                                                        KONVERSI,
+                                                                                                        ACTUAL_DELIVERY");
                                                             while ($dt_sum = db2_fetch_assoc($q_sum_po_selesai)) :
                                                         ?>
                                                         <tr>
