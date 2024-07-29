@@ -105,6 +105,8 @@
                                                                 $where_no_order_po     = "isqd.NO_ORDER = '$_POST[no_order]' AND NO_PO = '$_POST[no_po]'";
                                                             }elseif($_POST['no_order'] AND empty($_POST['no_po'])){
                                                                 $where_no_order_po     = "isqd.NO_ORDER = '$_POST[no_order]'";
+                                                            }elseif(empty($_POST['no_order']) AND ($_POST['no_po'])){
+                                                                $where_no_order_po     = "NO_PO = '$_POST[no_po]'";
                                                             }else{
                                                                 $where_no_order_po     = "";
                                                             }
