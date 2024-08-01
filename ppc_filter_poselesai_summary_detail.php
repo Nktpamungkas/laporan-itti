@@ -52,17 +52,35 @@
                                     SATUAN_NETTO_2,
                                     KONVERSI,
                                     ACTUAL_DELIVERY,
-                                    QTY_SUDAH_KIRIM,
-                                    QTY_SUDAH_KIRIM_2,
-                                    QTY_READY,
-                                    QTY_READY2
+                                    SUM(QTY_SUDAH_KIRIM) AS QTY_SUDAH_KIRIM,
+                                    SUM(QTY_SUDAH_KIRIM_2) AS QTY_SUDAH_KIRIM_2
                                 FROM 
                                     ITXVIEW_SUMMARY_QTY_DELIVERY 
                                 WHERE 
                                     NO_ORDER = '$no_order' 
                                     AND ORDERLINE = '$orderline' 
+                                GROUP BY
+                                    SALESDOCUMENTPROVISIONALCODE,
+                                    GOODSISSUEDATE,
+                                    LOTCODE,
+                                    ORDERLINE,
+                                    PELANGGAN,
+                                    NO_ORDER,
+                                    NO_PO,
+                                    KET_PRODUCT,
+                                    STYLE,
+                                    LEBAR,
+                                    GRAMASI,
+                                    WARNA,
+                                    NO_WARNA,
+                                    NETTO,
+                                    SATUAN_NETTO,
+                                    NETTO_2,
+                                    SATUAN_NETTO_2,
+                                    KONVERSI,
+                                    ACTUAL_DELIVERY
                                 ORDER BY 
-                                    SALESDOCUMENTPROVISIONALCODE 
+                                    LOTCODE 
                                     ASC";
 
             $q_sum_po_selesai   = db2_exec($conn1, $query);
@@ -130,6 +148,17 @@
                                                         AND b.LOTCODE = '$dt_sum_detail[LOTCODE]' 
                                                         AND TRIM(b.DECOSUBCODE02) || '-' || TRIM(b.DECOSUBCODE03) = '$dt_sum_detail[KET_PRODUCT]'");
                 $d_roll_ready   = db2_fetch_assoc($q_roll_ready);  
+
+                $q_ready        = db2_exec($conn1, "SELECT
+                                                        SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
+                                                        SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
+                                                    FROM
+                                                        BALANCE b
+                                                    WHERE
+                                                        PROJECTCODE = '$no_order'
+                                                        AND LOTCODE = '$dt_sum_detail[LOTCODE]'
+                                                        AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum_detail[KET_PRODUCT]'");
+                $d_qty_ready    = db2_fetch_assoc($q_ready);
         ?>
             <tr>
                 <td><?= $d_demand['PRODUCTIONDEMANDCODE']; ?></td>
@@ -159,15 +188,15 @@
                 </td>
 
                 <td><?= $d_roll_pengiriman['ROLL']; ?></td>
-                <td><?= $dt_sum_detail['QTY_SUDAH_KIRIM'] ?></td>
-                <td><?= $dt_sum_detail['QTY_SUDAH_KIRIM_2'] ?></td>
+                <td><?= number_format($dt_sum_detail['QTY_SUDAH_KIRIM'], 2); ?></td>
+                <td><?= number_format($dt_sum_detail['QTY_SUDAH_KIRIM_2'], 2); ?></td>
 
                 <td><?= $dt_sum_detail['SALESDOCUMENTPROVISIONALCODE'] ?></td>
                 <td><?= $dt_sum_detail['GOODSISSUEDATE'] ?></td>
 
                 <td><?= $d_roll_ready['ROLL']; ?></td>
-                <td><?= $dt_sum_detail['QTY_READY'] ?></td>
-                <td><?= $dt_sum_detail['QTY_READY2'] ?></td>
+                <td><?= $d_qty_ready['QTY_READY']; ?></td>
+                <td><?= $d_qty_ready['QTY_READY_2']; ?></td>
 
                 <td></td>
             </tr>

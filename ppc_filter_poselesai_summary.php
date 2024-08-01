@@ -88,8 +88,8 @@
                                                             <th title="PENGAMBILAN LAPORAN PENGIRIMAN">QTY SUDAH KIRIM (YD/MTR)</th>
                                                             <th title="QTY NETTO - QTY KIRIM">QTY KURANG KIRIM (KG)</th>
                                                             <th title="QTY NETTO - QTY KIRIM">QTY KURANG KIRIM (YD/MTR)</th>
-                                                            <th title="QTY NETTO - QTY KIRIM -QTY READY	">QTY KURANG (KG)</th>
-                                                            <th title="QTY NETTO - QTY KIRIM -QTY READY	">QTY KURANG (YD/MTR)</th>
+                                                            <th title="QTY NETTO - QTY KIRIM - QTY READY">QTY KURANG (KG)</th>
+                                                            <th title="QTY NETTO - QTY KIRIM - QTY READY">QTY KURANG (YD/MTR)</th>
                                                             <th title="AMBIL DARI BALANCE">QTY READY (KG)</th>
                                                             <th title="AMBIL DARI BALANCE">QTY READY (YD/MTR)</th>
                                                             <th title="DELIVERY ACTUAL - TANGGAL HARI INI">DELAY</th>
@@ -97,7 +97,7 @@
                                                     </thead>
                                                     <tbody>
                                                         <?php
-                                                            ini_set("error_reporting", 0);
+                                                            ini_set("error_reporting", 1);
                                                             session_start();
                                                             require_once "koneksi.php";
 
@@ -111,7 +111,7 @@
                                                                 $where_no_order_po     = "";
                                                             }
 
-                                                            $q_sum_po_selesai   = db2_exec($conn1, "SELECT 
+                                                            $q_sum_po_selesai   = db2_exec($conn1, "SELECT
                                                                                                         ORDERLINE,
                                                                                                         PELANGGAN,
                                                                                                         NO_ORDER,
@@ -128,32 +128,6 @@
                                                                                                         ACTUAL_DELIVERY,
                                                                                                         SUM(QTY_SUDAH_KIRIM) AS QTY_SUDAH_KIRIM,
                                                                                                         SUM(QTY_SUDAH_KIRIM_2) AS QTY_SUDAH_KIRIM_2,
-                                                                                                        SUM(QTY_READY) AS QTY_READY,
-                                                                                                        SUM(QTY_READY2) AS QTY_READY2,
-                                                                                                        CASE
-                                                                                                            WHEN DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD')) < 0 THEN 0
-                                                                                                            ELSE DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD'))
-                                                                                                        END	AS DELAY
-                                                                                                    FROM 
-                                                                                                    (SELECT
-                                                                                                        ORDERLINE,
-                                                                                                        PELANGGAN,
-                                                                                                        NO_ORDER,
-                                                                                                        NO_PO,
-                                                                                                        KET_PRODUCT,
-                                                                                                        STYLE,
-                                                                                                        LEBAR,
-                                                                                                        GRAMASI,
-                                                                                                        WARNA,
-                                                                                                        NO_WARNA,
-                                                                                                        NETTO,
-                                                                                                        NETTO_2,
-                                                                                                        KONVERSI,
-                                                                                                        ACTUAL_DELIVERY,
-                                                                                                        (QTY_SUDAH_KIRIM) AS QTY_SUDAH_KIRIM,
-                                                                                                        (QTY_SUDAH_KIRIM_2) AS QTY_SUDAH_KIRIM_2,
-                                                                                                        (QTY_READY) AS QTY_READY,
-                                                                                                        (QTY_READY2) AS QTY_READY2,
                                                                                                         CASE
                                                                                                             WHEN DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD')) < 0 THEN 0
                                                                                                             ELSE DAYS(now()) - DAYS(Timestamp_Format(ACTUAL_DELIVERY, 'YYYY-MM-DD'))
@@ -176,30 +150,55 @@
                                                                                                         NETTO,
                                                                                                         NETTO_2,
                                                                                                         KONVERSI,
-                                                                                                        ACTUAL_DELIVERY,
-                                                                                                        QTY_SUDAH_KIRIM,
-                                                                                                        QTY_SUDAH_KIRIM_2,
-                                                                                                        QTY_READY,
-                                                                                                        QTY_READY2
+                                                                                                        ACTUAL_DELIVERY
                                                                                                     ORDER BY
-                                                                                                        ORDERLINE 
-                                                                                                    ASC)
-                                                                                                    GROUP BY
-                                                                                                        ORDERLINE,
-                                                                                                        PELANGGAN,
-                                                                                                        NO_ORDER,
-                                                                                                        NO_PO,
-                                                                                                        KET_PRODUCT,
-                                                                                                        STYLE,
-                                                                                                        LEBAR,
-                                                                                                        GRAMASI,
-                                                                                                        WARNA,
-                                                                                                        NO_WARNA,
-                                                                                                        NETTO,
-                                                                                                        NETTO_2,
-                                                                                                        KONVERSI,
-                                                                                                        ACTUAL_DELIVERY");
+	                                                                                                    ORDERLINE ASC");
                                                             while ($dt_sum = db2_fetch_assoc($q_sum_po_selesai)) :
+                                                                $q_lotcode      = db2_exec($conn1, "SELECT
+                                                                                                        LISTAGG(DISTINCT ''''|| TRIM(LOTCODE) ||'''', ', ')  AS LOTCODE
+                                                                                                    FROM 
+                                                                                                        ITXVIEW_SUMMARY_QTY_DELIVERY 
+                                                                                                    WHERE 
+                                                                                                        NO_ORDER = '$dt_sum[NO_ORDER]' 
+                                                                                                        AND ORDERLINE = '$dt_sum[ORDERLINE]'");
+                                                                $d_lotcode      = db2_fetch_assoc($q_lotcode);
+
+                                                                if($d_lotcode['LOTCODE']){
+                                                                    $q_ready        = db2_exec($conn1, "SELECT
+                                                                                                            SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
+                                                                                                            SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
+                                                                                                        FROM
+                                                                                                            BALANCE b
+                                                                                                        WHERE
+                                                                                                            PROJECTCODE = '$dt_sum[NO_ORDER]'
+                                                                                                            AND LOTCODE IN ($d_lotcode[LOTCODE])
+                                                                                                            AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]'");
+                                                                    $d_qty_ready    = db2_fetch_assoc($q_ready);
+                                                                }else{
+                                                                    $q_lotcode      = db2_exec($conn1, "SELECT
+                                                                                                            LISTAGG(DISTINCT ''''|| TRIM(PRODUCTIONORDERCODE) ||'''', ', ')  AS LOTCODE
+                                                                                                        FROM 
+                                                                                                            ITXVIEWKK i 
+                                                                                                        WHERE 
+                                                                                                            PROJECTCODE = '$dt_sum[NO_ORDER]' 
+                                                                                                            AND ORIGDLVSALORDERLINEORDERLINE = '$dt_sum[ORDERLINE]'
+                                                                                                            AND PROGRESSSTATUS_DEMAND = 6
+                                                                                                            AND NOT DELIVERYDATE IS NULL");
+                                                                    $d_lotcode      = db2_fetch_assoc($q_lotcode);
+
+                                                                    if($d_lotcode['LOTCODE']){
+                                                                        $q_ready        = db2_exec($conn1, "SELECT
+                                                                                                                SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
+                                                                                                                SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
+                                                                                                            FROM
+                                                                                                                BALANCE b
+                                                                                                            WHERE
+                                                                                                                PROJECTCODE = '$dt_sum[NO_ORDER]'
+                                                                                                                AND LOTCODE IN ($d_lotcode[LOTCODE])
+                                                                                                                AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]'");
+                                                                        $d_qty_ready    = db2_fetch_assoc($q_ready);
+                                                                    }
+                                                                }
                                                         ?>
                                                         <tr>
                                                             <td><?= $dt_sum['PELANGGAN']; ?></td>
@@ -217,12 +216,12 @@
                                                             <td align="center"><?= $dt_sum['KONVERSI']; ?></td>
                                                             <td align="right"><?= $dt_sum['QTY_SUDAH_KIRIM']; ?></td>
                                                             <td align="right"><?= $dt_sum['QTY_SUDAH_KIRIM_2']; ?></td>
-                                                            <td align="right"><?= $dt_sum['NETTO']-$dt_sum['QTY_SUDAH_KIRIM']; ?></td>
-                                                            <td align="right"><?= $dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2']; ?></td>
-                                                            <td align="right"><?= $dt_sum['NETTO']-$dt_sum['QTY_SUDAH_KIRIM']-$dt_sum['QTY_READY']; ?></td>
-                                                            <td align="right"><?= $dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2']-$dt_sum['QTY_READY2']; ?></td>
-                                                            <td align="right"><?= $dt_sum['QTY_READY']; ?></td>
-                                                            <td align="right"><?= $dt_sum['QTY_READY2']; ?></td>
+                                                            <td align="right"><?= number_format($dt_sum['NETTO']-$dt_sum['QTY_SUDAH_KIRIM'], 2); ?></td>
+                                                            <td align="right"><?= number_format($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?></td>
+                                                            <td align="right"><?= number_format($dt_sum['NETTO']-$dt_sum['QTY_SUDAH_KIRIM']-$d_qty_ready['QTY_READY'], 2); ?></td>
+                                                            <td align="right"><?= number_format($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'], 2); ?></td>
+                                                            <td align="right"><?= $d_qty_ready['QTY_READY']; ?></td>
+                                                            <td align="right"><?= $d_qty_ready['QTY_READY_2']; ?></td>
                                                             <td><?= $dt_sum['DELAY']; ?></td>
                                                         </tr>
                                                         <?php endwhile; ?>
