@@ -83,7 +83,7 @@
                                                             <th>NO WARNA</th>
                                                             <th>DELIVERY ACTUAL</th>
                                                             <th>NETTO (KG)</th>
-                                                            <th>NETTO (YD)</th>
+                                                            <th>NETTO (YD/MTR)</th>
                                                             <th>KONVERSI</th>
                                                             <th title="PENGAMBILAN LAPORAN PENGIRIMAN">QTY SUDAH KIRIM (KG)</th>
                                                             <th title="PENGAMBILAN LAPORAN PENGIRIMAN">QTY SUDAH KIRIM (YD/MTR)</th>
