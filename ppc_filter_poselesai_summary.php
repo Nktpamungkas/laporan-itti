@@ -71,6 +71,7 @@
                                                 <table id="excel-LA" class="table table-striped table-bordered nowrap">
                                                     <thead>
                                                         <tr>
+                                                            <th>OPSI</th>
                                                             <th>PELANGGAN</th>
                                                             <th>NO. ORDER</th>
                                                             <th>NO. PO</th>
@@ -114,7 +115,7 @@
                                                             $q_sum_po_selesai   = db2_exec($conn1, "SELECT
                                                                                                         ORDERLINE,
                                                                                                         PELANGGAN,
-                                                                                                        NO_ORDER,
+                                                                                                        TRIM(NO_ORDER) AS NO_ORDER,
                                                                                                         NO_PO,
                                                                                                         KET_PRODUCT,
                                                                                                         STYLE,
@@ -154,53 +155,74 @@
                                                                                                     ORDER BY
 	                                                                                                    ORDERLINE ASC");
                                                             while ($dt_sum = db2_fetch_assoc($q_sum_po_selesai)) :
-                                                                $q_lotcode      = db2_exec($conn1, "SELECT
-                                                                                                        LISTAGG(DISTINCT ''''|| TRIM(LOTCODE) ||'''', ', ')  AS LOTCODE
-                                                                                                    FROM 
-                                                                                                        ITXVIEW_SUMMARY_QTY_DELIVERY 
-                                                                                                    WHERE 
-                                                                                                        NO_ORDER = '$dt_sum[NO_ORDER]' 
-                                                                                                        AND ORDERLINE = '$dt_sum[ORDERLINE]'");
-                                                                $d_lotcode      = db2_fetch_assoc($q_lotcode);
+                                                                // $q_lotcode      = db2_exec($conn1, "SELECT
+                                                                //                                         LISTAGG(DISTINCT ''''|| TRIM(LOTCODE) ||'''', ', ')  AS LOTCODE
+                                                                //                                     FROM 
+                                                                //                                         ITXVIEW_SUMMARY_QTY_DELIVERY 
+                                                                //                                     WHERE 
+                                                                //                                         NO_ORDER = '$dt_sum[NO_ORDER]' 
+                                                                //                                         AND ORDERLINE = '$dt_sum[ORDERLINE]'");
+                                                                // $d_lotcode      = db2_fetch_assoc($q_lotcode);
 
-                                                                if($d_lotcode['LOTCODE']){
-                                                                    $q_ready        = db2_exec($conn1, "SELECT
-                                                                                                            SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
-                                                                                                            SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
-                                                                                                        FROM
-                                                                                                            BALANCE b
-                                                                                                        WHERE
-                                                                                                            PROJECTCODE = '$dt_sum[NO_ORDER]'
-                                                                                                            AND LOTCODE IN ($d_lotcode[LOTCODE])
-                                                                                                            AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]'");
-                                                                    $d_qty_ready    = db2_fetch_assoc($q_ready);
-                                                                }else{
-                                                                    $q_lotcode      = db2_exec($conn1, "SELECT
-                                                                                                            LISTAGG(DISTINCT ''''|| TRIM(PRODUCTIONORDERCODE) ||'''', ', ')  AS LOTCODE
-                                                                                                        FROM 
-                                                                                                            ITXVIEWKK i 
-                                                                                                        WHERE 
-                                                                                                            PROJECTCODE = '$dt_sum[NO_ORDER]' 
-                                                                                                            AND ORIGDLVSALORDERLINEORDERLINE = '$dt_sum[ORDERLINE]'
-                                                                                                            AND PROGRESSSTATUS_DEMAND = 6
-                                                                                                            AND NOT DELIVERYDATE IS NULL");
-                                                                    $d_lotcode      = db2_fetch_assoc($q_lotcode);
+                                                                // if($d_lotcode['LOTCODE']){
+                                                                //     $q_ready        = db2_exec($conn1, "SELECT
+                                                                //                                             SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
+                                                                //                                             SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
+                                                                //                                         FROM
+                                                                //                                             BALANCE b
+                                                                //                                         WHERE
+                                                                //                                             PROJECTCODE = '$dt_sum[NO_ORDER]'
+                                                                //                                             AND LOTCODE IN ($d_lotcode[LOTCODE])
+                                                                //                                             AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]'
+                                                                //                                             AND LOGICALWAREHOUSECODE = 'M031'");
+                                                                //     $d_qty_ready    = db2_fetch_assoc($q_ready);
+                                                                // }else{
+                                                                //     $q_lotcode      = db2_exec($conn1, "SELECT
+                                                                //                                             LISTAGG(DISTINCT ''''|| TRIM(PRODUCTIONORDERCODE) ||'''', ', ')  AS LOTCODE
+                                                                //                                         FROM 
+                                                                //                                             ITXVIEWKK i 
+                                                                //                                         WHERE 
+                                                                //                                             PROJECTCODE = '$dt_sum[NO_ORDER]' 
+                                                                //                                             AND ORIGDLVSALORDERLINEORDERLINE = '$dt_sum[ORDERLINE]'
+                                                                //                                             AND PROGRESSSTATUS_DEMAND = 6
+                                                                //                                             AND NOT DELIVERYDATE IS NULL");
+                                                                //     $d_lotcode      = db2_fetch_assoc($q_lotcode);
 
-                                                                    if($d_lotcode['LOTCODE']){
-                                                                        $q_ready        = db2_exec($conn1, "SELECT
-                                                                                                                SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
-                                                                                                                SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
-                                                                                                            FROM
-                                                                                                                BALANCE b
-                                                                                                            WHERE
-                                                                                                                PROJECTCODE = '$dt_sum[NO_ORDER]'
-                                                                                                                AND LOTCODE IN ($d_lotcode[LOTCODE])
-                                                                                                                AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]'");
-                                                                        $d_qty_ready    = db2_fetch_assoc($q_ready);
-                                                                    }
-                                                                }
+                                                                //     if($d_lotcode['LOTCODE']){
+                                                                //         $q_ready        = db2_exec($conn1, "SELECT
+                                                                //                                                 SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
+                                                                //                                                 SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
+                                                                //                                             FROM
+                                                                //                                                 BALANCE b
+                                                                //                                             WHERE
+                                                                //                                                 PROJECTCODE = '$dt_sum[NO_ORDER]'
+                                                                //                                                 AND LOTCODE IN ($d_lotcode[LOTCODE])
+                                                                //                                                 AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]'
+                                                                //                                                 AND LOGICALWAREHOUSECODE = 'M031'");
+                                                                //         $d_qty_ready    = db2_fetch_assoc($q_ready);
+                                                                //     }
+                                                                // }
+
+                                                                $query          = "SELECT
+                                                                                        SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
+                                                                                        SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
+                                                                                    FROM
+                                                                                        BALANCE b
+                                                                                    WHERE
+                                                                                        PROJECTCODE = '$dt_sum[NO_ORDER]'
+                                                                                        AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]' 
+                                                                                        AND TRIM(DECOSUBCODE05) = '$dt_sum[NO_WARNA]'
+                                                                                        AND LOGICALWAREHOUSECODE = 'M031'";
+
+                                                                $q_qty_ready   = db2_exec($conn1, $query);
+                                                                $d_qty_ready        = db2_fetch_assoc($q_qty_ready);
                                                         ?>
                                                         <tr>
+                                                            <td>
+                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>">Detail Qty Kirim</a>
+                                                                |
+                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&ket_product=<?= $dt_sum['KET_PRODUCT']; ?>&no_warna=<?= $dt_sum['NO_WARNA']; ?>">Detail Qty Ready</a>
+                                                            </td>
                                                             <td><?= $dt_sum['PELANGGAN']; ?></td>
                                                             <td><?= $dt_sum['NO_ORDER']; ?></td>
                                                             <td><?= $dt_sum['NO_PO']; ?></td>
@@ -208,20 +230,20 @@
                                                             <td><?= $dt_sum['STYLE']; ?></td>
                                                             <td align="center"><?= number_format($dt_sum['LEBAR'], 0); ?></td>
                                                             <td align="center"><?= number_format($dt_sum['GRAMASI'], 0); ?></td>
-                                                            <td><a target="_blank" href="ppc_filter_poselesai_summary_detail.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><?= $dt_sum['WARNA']; ?></a></td>
+                                                            <td><?= $dt_sum['WARNA']; ?></td>
                                                             <td><?= $dt_sum['NO_WARNA']; ?></td>
                                                             <td><?= $dt_sum['ACTUAL_DELIVERY']; ?></td>
-                                                            <td align="right"><?= $dt_sum['NETTO']; ?></td>
-                                                            <td align="right"><?= $dt_sum['NETTO_2']; ?></td>
+                                                            <td align="right"><?= number_format($dt_sum['NETTO'], 2); ?></td>
+                                                            <td align="right"><?= number_format($dt_sum['NETTO_2'], 2); ?></td>
                                                             <td align="center"><?= $dt_sum['KONVERSI']; ?></td>
-                                                            <td align="right"><?= $dt_sum['QTY_SUDAH_KIRIM']; ?></td>
-                                                            <td align="right"><?= $dt_sum['QTY_SUDAH_KIRIM_2']; ?></td>
+                                                            <td align="right"><?= number_format($dt_sum['QTY_SUDAH_KIRIM'], 2); ?></td>
+                                                            <td align="right"><?= number_format($dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO']-$dt_sum['QTY_SUDAH_KIRIM'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO']-$dt_sum['QTY_SUDAH_KIRIM']-$d_qty_ready['QTY_READY'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'], 2); ?></td>
-                                                            <td align="right"><?= $d_qty_ready['QTY_READY']; ?></td>
-                                                            <td align="right"><?= $d_qty_ready['QTY_READY_2']; ?></td>
+                                                            <td align="right"><?= number_format($d_qty_ready['QTY_READY'], 2); ?></td>
+                                                            <td align="right"><?= number_format($d_qty_ready['QTY_READY_2'], 2); ?></td>
                                                             <td><?= $dt_sum['DELAY']; ?></td>
                                                         </tr>
                                                         <?php endwhile; ?>
