@@ -137,6 +137,7 @@
                                                                                                         ITXVIEW_SUMMARY_QTY_DELIVERY isqd
                                                                                                     WHERE
                                                                                                         $where_no_order_po
+                                                                                                        AND NOT QUALITYREASONCODE = 'FOC'
                                                                                                     GROUP BY
                                                                                                         ORDERLINE,
                                                                                                         PELANGGAN,

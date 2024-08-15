@@ -59,6 +59,7 @@
                                     WHERE 
                                         NO_ORDER = '$no_order' 
                                         AND ORDERLINE = '$orderline' 
+                                        AND NOT QUALITYREASONCODE = 'FOC'
                                     GROUP BY
                                         SALESDOCUMENTPROVISIONALCODE,
                                         GOODSISSUEDATE,
