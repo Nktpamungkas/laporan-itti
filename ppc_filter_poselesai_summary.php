@@ -89,7 +89,7 @@
                                                             <th title="PENGAMBILAN LAPORAN PENGIRIMAN">QTY SUDAH KIRIM (YD/MTR)</th>
                                                             <th title="QTY NETTO - QTY KIRIM">QTY KURANG KIRIM (KG)</th>
                                                             <th title="QTY NETTO - QTY KIRIM">QTY KURANG KIRIM (YD/MTR)</th>
-                                                            <th title="QTY NETTO - QTY KIRIM - QTY READY">QTY KURANG (KG)</th>
+                                                            <th title="QTY KURANG (YD/MTR)/KONVERSI">QTY KURANG (KG)</th>
                                                             <th title="QTY NETTO - QTY KIRIM - QTY READY">QTY KURANG (YD/MTR)</th>
                                                             <th title="AMBIL DARI BALANCE">QTY READY (KG)</th>
                                                             <th title="AMBIL DARI BALANCE">QTY READY (YD/MTR)</th>
@@ -241,8 +241,8 @@
                                                             <td align="right"><?= number_format($dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO']-$dt_sum['QTY_SUDAH_KIRIM'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?></td>
-                                                            <td align="right"><?= number_format($dt_sum['NETTO']-$dt_sum['QTY_SUDAH_KIRIM']-$d_qty_ready['QTY_READY'], 2); ?></td>
-                                                            <td align="right"><?= number_format($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'], 2); ?></td>
+                                                            <td align="right"><?= number_format(($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'])/$dt_sum['KONVERSI'], 2); ?></td>
+                                                            <td align="right"><?= number_format($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'], 2); ?></td> <!-- QTY KURANG (YD/MTR) -->
                                                             <td align="right"><?= number_format($d_qty_ready['QTY_READY'], 2); ?></td>
                                                             <td align="right"><?= number_format($d_qty_ready['QTY_READY_2'], 2); ?></td>
                                                             <td><?= $dt_sum['DELAY']; ?></td>
