@@ -57,6 +57,14 @@
                                                                                                                             echo $_POST['no_po'];
                                                                                                                         } ?>">
                                                 </div>
+                                                <div class="col-sm-12 col-xl-2 m-b-30">
+                                                    <h4 class="sub-title">Dari Tanggal</h4>
+                                                    <input type="date" name="tgl1" class="form-control" value="<?= isset($_POST['submit']) ? $_POST['tgl1'] : '' ?>">
+                                                </div>
+                                                <div class="col-sm-12 col-xl-2 m-b-30">
+                                                    <h4 class="sub-title">Sampai Tanggal</h4>
+                                                    <input type="date" name="tgl2" class="form-control" value="<?= isset($_POST['submit']) ? $_POST['tgl2'] : '' ?>">
+                                                </div>
                                                 <div class="col-sm-12 col-xl-12 m-b-30">
                                                     <button type="submit" name="submit" class="btn btn-primary"><i class="icofont icofont-search-alt-1"></i> Cari data</button>
                                                 </div>
@@ -102,15 +110,21 @@
                                                             session_start();
                                                             require_once "koneksi.php";
 
-                                                            if($_POST['no_order'] AND $_POST['no_po']){
-                                                                $where_no_order_po     = "NO_ORDER = '$_POST[no_order]' AND NO_PO = '$_POST[no_po]'";
-                                                            }elseif($_POST['no_order'] AND empty($_POST['no_po'])){
-                                                                $where_no_order_po     = "NO_ORDER = '$_POST[no_order]'";
-                                                            }elseif(empty($_POST['no_order']) AND ($_POST['no_po'])){
-                                                                $where_no_order_po     = "NO_PO = '$_POST[no_po]'";
-                                                            }else{
-                                                                $where_no_order_po     = "";
+                                                            $wheres = [];
+
+                                                            if($_POST['no_order']){
+                                                                $wheres[] = "NO_ORDER = '$_POST[no_order]'";
                                                             }
+                                                            if($_POST['no_po']){
+                                                                $wheres[] = "NO_PO = '$_POST[no_po]'";
+                                                            }
+                                                            if($_POST['tgl1'] && $_POST['tgl2']) {
+                                                                $wheres[] = "ACTUAL_DELIVERY BETWEEN '$_POST[tgl1]' AND '$_POST[tgl2]'";
+                                                            }
+
+                                                            $wheres[] = "NOT QUALITYREASONCODE = 'FOC'";
+
+                                                            $where_and = implode(" AND ", $wheres);
 
                                                             $q_sum_po_selesai   = db2_exec($conn1, "SELECT
                                                                                                         ORDERLINE,
@@ -136,8 +150,7 @@
                                                                                                     FROM
                                                                                                         ITXVIEW_SUMMARY_QTY_DELIVERY isqd
                                                                                                     WHERE
-                                                                                                        $where_no_order_po
-                                                                                                        AND NOT QUALITYREASONCODE = 'FOC'
+                                                                                                        $where_and
                                                                                                     GROUP BY
                                                                                                         ORDERLINE,
                                                                                                         PELANGGAN,
