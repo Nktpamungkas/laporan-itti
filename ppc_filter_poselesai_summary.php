@@ -137,8 +137,10 @@
                                                                                                         GRAMASI,
                                                                                                         WARNA,
                                                                                                         NO_WARNA,
+                                                                                                        PRICEUNITOFMEASURECODE,
                                                                                                         NETTO,
                                                                                                         NETTO_2,
+                                                                                                        NETTO_M,
                                                                                                         KONVERSI,
                                                                                                         ACTUAL_DELIVERY,
                                                                                                         SUM(QTY_SUDAH_KIRIM) AS QTY_SUDAH_KIRIM,
@@ -162,8 +164,10 @@
                                                                                                         GRAMASI,
                                                                                                         WARNA,
                                                                                                         NO_WARNA,
+                                                                                                        PRICEUNITOFMEASURECODE,
                                                                                                         NETTO,
                                                                                                         NETTO_2,
+                                                                                                        NETTO_M,
                                                                                                         KONVERSI,
                                                                                                         ACTUAL_DELIVERY
                                                                                                     ORDER BY
@@ -248,14 +252,33 @@
                                                             <td><?= $dt_sum['NO_WARNA']; ?></td>
                                                             <td><?= $dt_sum['ACTUAL_DELIVERY']; ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO'], 2); ?></td>
-                                                            <td align="right"><?= number_format($dt_sum['NETTO_2'], 2); ?></td>
+                                                            <td align="right">
+                                                                <?php
+                                                                    if(TRIM($dt_sum['PRICEUNITOFMEASURECODE']) == 'm'){
+                                                                        echo number_format($dt_sum['NETTO_M'] ?? 2, 0);
+                                                                    }else{
+                                                                        echo number_format($dt_sum['NETTO_2'] ?? 2, 0);
+                                                                    }
+                                                                ?>
+                                                            </td>
                                                             <td align="center"><?= $dt_sum['KONVERSI']; ?></td>
                                                             <td align="right"><?= number_format($dt_sum['QTY_SUDAH_KIRIM'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO']-$dt_sum['QTY_SUDAH_KIRIM'], 2); ?></td>
-                                                            <td align="right"><?= number_format($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?></td>
-                                                            <td align="right"><?= number_format(($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'])/$dt_sum['KONVERSI'], 2); ?></td>
-                                                            <td align="right"><?= number_format($dt_sum['NETTO_2']-$dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'], 2); ?></td> <!-- QTY KURANG (YD/MTR) -->
+                                                            <td align="right">
+                                                                <?= number_format(
+                                                                    (trim($dt_sum['PRICEUNITOFMEASURECODE']) == 'm' ? $dt_sum['NETTO_M'] : $dt_sum['NETTO_2']) - $dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?>
+                                                            </td>
+                                                            <td align="right">
+                                                                <?= number_format(
+                                                                    ((trim($dt_sum['PRICEUNITOFMEASURECODE']) == 'm' ? $dt_sum['NETTO_M'] : $dt_sum['NETTO_2']) - $dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'])/$dt_sum['KONVERSI'], 2); ?>
+
+                                                            </td>
+                                                            <td align="right">
+                                                                <?= number_format(
+                                                                    (trim($dt_sum['PRICEUNITOFMEASURECODE']) == 'm' ? $dt_sum['NETTO_M'] : $dt_sum['NETTO_2']) - $dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'], 2); ?>
+
+                                                            </td> <!-- QTY KURANG (YD/MTR) -->
                                                             <td align="right"><?= number_format($d_qty_ready['QTY_READY'], 2); ?></td>
                                                             <td align="right"><?= number_format($d_qty_ready['QTY_READY_2'], 2); ?></td>
                                                             <td><?= $dt_sum['DELAY']; ?></td>
