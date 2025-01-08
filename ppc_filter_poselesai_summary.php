@@ -221,25 +221,32 @@
                                                                 //     }
                                                                 // }
 
+                                                                $ResultLotCode  = "SELECT 
+                                                                                        LISTAGG('''' || TRIM(PRODUCTIONORDERCODE) || '''', ', ' ) AS PRODUCTIONORDERCODE 
+                                                                                    FROM 
+                                                                                        ITXVIEWKK
+                                                                                    WHERE 
+                                                                                        PROJECTCODE = '$dt_sum[NO_ORDER]' 
+                                                                                        AND ORIGDLVSALORDERLINEORDERLINE = '$dt_sum[ORDERLINE]'";
+                                                                $exec_lotcode   = db2_exec($conn1, $ResultLotCode);
+                                                                $fetch_lotcode  = db2_fetch_assoc($exec_lotcode);
+
                                                                 $query          = "SELECT
                                                                                         SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
                                                                                         SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
                                                                                     FROM
                                                                                         BALANCE b
                                                                                     WHERE
-                                                                                        PROJECTCODE = '$dt_sum[NO_ORDER]'
-                                                                                        AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]' 
-                                                                                        AND TRIM(DECOSUBCODE05) = '$dt_sum[NO_WARNA]'
-                                                                                        AND LOGICALWAREHOUSECODE = 'M031'";
-
+                                                                                        LOTCODE IN ($fetch_lotcode[PRODUCTIONORDERCODE])";
                                                                 $q_qty_ready   = db2_exec($conn1, $query);
-                                                                $d_qty_ready        = db2_fetch_assoc($q_qty_ready);
+                                                                $d_qty_ready   = db2_fetch_assoc($q_qty_ready);
                                                         ?>
                                                         <tr>
                                                             <td>
                                                                 <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>">Detail Qty Kirim</a>
                                                                 |
-                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&ket_product=<?= $dt_sum['KET_PRODUCT']; ?>&no_warna=<?= $dt_sum['NO_WARNA']; ?>">Detail Qty Ready</a>
+                                                                <!-- <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&ket_product=<?= $dt_sum['KET_PRODUCT']; ?>&no_warna=<?= $dt_sum['NO_WARNA']; ?>">Detail Qty Ready</a> -->
+                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?PRODUCTIONORDERCODE=<?= $fetch_lotcode['PRODUCTIONORDERCODE'] ?>">Detail Qty Ready</a>
                                                             </td>
                                                             <td><?= $dt_sum['PELANGGAN']; ?></td>
                                                             <td><?= $dt_sum['NO_ORDER']; ?></td>

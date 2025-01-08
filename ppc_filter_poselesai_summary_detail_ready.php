@@ -30,6 +30,7 @@
                 $no_order       = $_GET['no_order'];
                 $ket_product    = $_GET['ket_product'];
                 $no_warna       = $_GET['no_warna'];
+                $fetch_lotcode  = $_GET['PRODUCTIONORDERCODE'];
 
                 $query          = "SELECT
                                         PROJECTCODE,
@@ -42,10 +43,11 @@
                                     FROM
                                         BALANCE b
                                     WHERE
-                                        PROJECTCODE = '$no_order'
-                                        AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$ket_product' 
-                                        AND TRIM(DECOSUBCODE05) = '$no_warna'
-                                        AND LOGICALWAREHOUSECODE = 'M031'
+                                        -- PROJECTCODE = '$no_order'
+                                        -- AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$ket_product' 
+                                        -- AND TRIM(DECOSUBCODE05) = '$no_warna'
+                                        -- AND LOGICALWAREHOUSECODE = 'M031'
+                                        LOTCODE IN ($fetch_lotcode)
                                     GROUP BY
                                         PROJECTCODE,
                                         LOTCODE,
