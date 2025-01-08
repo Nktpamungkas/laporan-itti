@@ -46,8 +46,8 @@
                                         -- PROJECTCODE = '$no_order'
                                         -- AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$ket_product' 
                                         -- AND TRIM(DECOSUBCODE05) = '$no_warna'
-                                        -- AND LOGICALWAREHOUSECODE = 'M031'
                                         LOTCODE IN ($fetch_lotcode)
+                                        AND LOGICALWAREHOUSECODE = 'M031'
                                     GROUP BY
                                         PROJECTCODE,
                                         LOTCODE,

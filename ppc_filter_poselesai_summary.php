@@ -237,7 +237,8 @@
                                                                                     FROM
                                                                                         BALANCE b
                                                                                     WHERE
-                                                                                        LOTCODE IN ($fetch_lotcode[PRODUCTIONORDERCODE])";
+                                                                                        LOTCODE IN ($fetch_lotcode[PRODUCTIONORDERCODE])
+                                                                                        AND LOGICALWAREHOUSECODE = 'M031'";
                                                                 $q_qty_ready   = db2_exec($conn1, $query);
                                                                 $d_qty_ready   = db2_fetch_assoc($q_qty_ready);
                                                         ?>
