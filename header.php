@@ -38,6 +38,11 @@
                                             Summary Qty Pengiriman & Sisa
                                         </a>
                                     </li>
+                                    <li class=" ">
+                                        <a href="ppc_Loss_Order.php" data-i18n="nav.animations.main">
+                                            Summary Loss Order 
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
