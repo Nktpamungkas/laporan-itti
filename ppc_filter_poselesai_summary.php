@@ -173,54 +173,6 @@
                                                                                                     ORDER BY
 	                                                                                                    ORDERLINE ASC");
                                                             while ($dt_sum = db2_fetch_assoc($q_sum_po_selesai)) :
-                                                                // $q_lotcode      = db2_exec($conn1, "SELECT
-                                                                //                                         LISTAGG(DISTINCT ''''|| TRIM(LOTCODE) ||'''', ', ')  AS LOTCODE
-                                                                //                                     FROM 
-                                                                //                                         ITXVIEW_SUMMARY_QTY_DELIVERY 
-                                                                //                                     WHERE 
-                                                                //                                         NO_ORDER = '$dt_sum[NO_ORDER]' 
-                                                                //                                         AND ORDERLINE = '$dt_sum[ORDERLINE]'");
-                                                                // $d_lotcode      = db2_fetch_assoc($q_lotcode);
-
-                                                                // if($d_lotcode['LOTCODE']){
-                                                                //     $q_ready        = db2_exec($conn1, "SELECT
-                                                                //                                             SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
-                                                                //                                             SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
-                                                                //                                         FROM
-                                                                //                                             BALANCE b
-                                                                //                                         WHERE
-                                                                //                                             PROJECTCODE = '$dt_sum[NO_ORDER]'
-                                                                //                                             AND LOTCODE IN ($d_lotcode[LOTCODE])
-                                                                //                                             AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]'
-                                                                //                                             AND LOGICALWAREHOUSECODE = 'M031'");
-                                                                //     $d_qty_ready    = db2_fetch_assoc($q_ready);
-                                                                // }else{
-                                                                //     $q_lotcode      = db2_exec($conn1, "SELECT
-                                                                //                                             LISTAGG(DISTINCT ''''|| TRIM(PRODUCTIONORDERCODE) ||'''', ', ')  AS LOTCODE
-                                                                //                                         FROM 
-                                                                //                                             ITXVIEWKK i 
-                                                                //                                         WHERE 
-                                                                //                                             PROJECTCODE = '$dt_sum[NO_ORDER]' 
-                                                                //                                             AND ORIGDLVSALORDERLINEORDERLINE = '$dt_sum[ORDERLINE]'
-                                                                //                                             AND PROGRESSSTATUS_DEMAND = 6
-                                                                //                                             AND NOT DELIVERYDATE IS NULL");
-                                                                //     $d_lotcode      = db2_fetch_assoc($q_lotcode);
-
-                                                                //     if($d_lotcode['LOTCODE']){
-                                                                //         $q_ready        = db2_exec($conn1, "SELECT
-                                                                //                                                 SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
-                                                                //                                                 SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
-                                                                //                                             FROM
-                                                                //                                                 BALANCE b
-                                                                //                                             WHERE
-                                                                //                                                 PROJECTCODE = '$dt_sum[NO_ORDER]'
-                                                                //                                                 AND LOTCODE IN ($d_lotcode[LOTCODE])
-                                                                //                                                 AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$dt_sum[KET_PRODUCT]'
-                                                                //                                                 AND LOGICALWAREHOUSECODE = 'M031'");
-                                                                //         $d_qty_ready    = db2_fetch_assoc($q_ready);
-                                                                //     }
-                                                                // }
-
                                                                 $ResultLotCode  = "SELECT 
                                                                                         LISTAGG('''' || TRIM(PRODUCTIONORDERCODE) || '''', ', ' ) AS PRODUCTIONORDERCODE 
                                                                                     FROM 
@@ -231,16 +183,18 @@
                                                                 $exec_lotcode   = db2_exec($conn1, $ResultLotCode);
                                                                 $fetch_lotcode  = db2_fetch_assoc($exec_lotcode);
 
-                                                                $query          = "SELECT
-                                                                                        SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
-                                                                                        SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
-                                                                                    FROM
-                                                                                        BALANCE b
-                                                                                    WHERE
-                                                                                        LOTCODE IN ($fetch_lotcode[PRODUCTIONORDERCODE])
-                                                                                        AND LOGICALWAREHOUSECODE = 'M031'";
-                                                                $q_qty_ready   = db2_exec($conn1, $query);
-                                                                $d_qty_ready   = db2_fetch_assoc($q_qty_ready);
+                                                                if($fetch_lotcode['PRODUCTIONORDERCODE']){
+                                                                    $query          = "SELECT
+                                                                                            SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
+                                                                                            SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
+                                                                                        FROM
+                                                                                            BALANCE b
+                                                                                        WHERE
+                                                                                            LOTCODE IN ($fetch_lotcode[PRODUCTIONORDERCODE])
+                                                                                            AND LOGICALWAREHOUSECODE = 'M031'";
+                                                                    $q_qty_ready   = db2_exec($conn1, $query);
+                                                                    $d_qty_ready   = db2_fetch_assoc($q_qty_ready);
+                                                                }
                                                         ?>
                                                         <tr>
                                                             <td>
