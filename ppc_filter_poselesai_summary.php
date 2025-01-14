@@ -191,7 +191,8 @@
                                                                                             BALANCE b
                                                                                         WHERE
                                                                                             LOTCODE IN ($fetch_lotcode[PRODUCTIONORDERCODE])
-                                                                                            AND LOGICALWAREHOUSECODE = 'M031'";
+                                                                                            AND LOGICALWAREHOUSECODE = 'M031'
+                                                                                            AND PROJECTCODE = '$dt_sum[NO_ORDER]'";
                                                                     $q_qty_ready   = db2_exec($conn1, $query);
                                                                     $d_qty_ready   = db2_fetch_assoc($q_qty_ready);
                                                                 }
@@ -201,7 +202,7 @@
                                                                 <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>">Detail Qty Kirim</a>
                                                                 |
                                                                 <!-- <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&ket_product=<?= $dt_sum['KET_PRODUCT']; ?>&no_warna=<?= $dt_sum['NO_WARNA']; ?>">Detail Qty Ready</a> -->
-                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?PRODUCTIONORDERCODE=<?= $fetch_lotcode['PRODUCTIONORDERCODE'] ?>">Detail Qty Ready</a>
+                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?PRODUCTIONORDERCODE=<?= $fetch_lotcode['PRODUCTIONORDERCODE'] ?>&no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>">Detail Qty Ready</a>
                                                             </td>
                                                             <td><?= $dt_sum['PELANGGAN']; ?></td>
                                                             <td><?= $dt_sum['NO_ORDER']; ?></td>

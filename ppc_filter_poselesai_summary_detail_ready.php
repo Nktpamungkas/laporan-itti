@@ -48,6 +48,7 @@
                                         -- AND TRIM(DECOSUBCODE05) = '$no_warna'
                                         LOTCODE IN ($fetch_lotcode)
                                         AND LOGICALWAREHOUSECODE = 'M031'
+                                        AND PROJECTCODE = '$no_order'
                                     GROUP BY
                                         PROJECTCODE,
                                         LOTCODE,
