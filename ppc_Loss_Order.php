@@ -95,6 +95,8 @@
                                                             <th title="PENGAMBILAN LAPORAN PENGIRIMAN">QTY SUDAH KIRIM (YD/MTR)</th>
                                                             <th>QTY BS (KG)</th>
                                                             <th>QTY BS (YD/MTR)</th>
+                                                            <th>QTY SISA (KG)</th>
+                                                            <th>QTY SISA (YD/MTR)</th>
                                                             <th>LOSS MASTER (KG)</th>
                                                             <th>LOSS AKTUAL (KG)</th>
                                                             <th>LOSS KIRIM (KG)</th>
@@ -205,6 +207,20 @@
                                                                 $q_packing       = db2_exec($conn1, $qty_packing);
                                                                 $dt_packing      = db2_fetch_assoc($q_packing);
                                                                 
+                                                                $qty_sisa     = "SELECT
+                                                                                    SUM(USERPRIMARYQUANTITY) AS QTYSISA_KG,
+                                                                                    SUM(USERSECONDARYQUANTITY) AS QTYSISA_YD_MTR
+                                                                                FROM
+                                                                                    STOCKTRANSACTION 
+                                                                                WHERE
+                                                                                    LOGICALWAREHOUSECODE = 'M033'
+                                                                                    AND TEMPLATECODE = '304'
+                                                                                    AND PROJECTCODE = '$dt_sum[NO_ORDER]'
+                                                                                    AND ITEMTYPECODE = 'KFF'
+                                                                                    AND QUALITYREASONCODE IN ('SA', 'SD','SF','SG','SM','SP','SR','ST')";
+                                                                $q_sisa       = db2_exec($conn1, $qty_sisa);
+                                                                $dt_sisa      = db2_fetch_assoc($q_sisa);
+                                                                
                                                                 $qty_bs     = "SELECT
                                                                                         SUM(USERPRIMARYQUANTITY) AS QTYBS_KG,
                                                                                         SUM(USERSECONDARYQUANTITY) AS QTYBS_YD_MTR
@@ -244,6 +260,8 @@
                                                             <td align="right"><?= number_format($dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_bs['QTYBS_KG'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_bs['QTYBS_YD_MTR'], 2); ?></td>
+                                                            <td align="right"><?= number_format($dt_sisa['QTYSISA_KG'], 2); ?></td>
+                                                            <td align="right"><?= number_format($dt_sisa['QTYSISA_YD_MTR'], 2); ?></td>
                                                             <td align="right">
                                                                 <?php 
                                                                     $bruto_kg = str_replace(',', '', number_format($dt_bruto['BRUTO_KG'], 2));
@@ -255,7 +273,7 @@
                                                                         $percentage = (($bruto_kg - $netto_kg) / $bruto_kg) * 100;
 
                                                                         // Format hasil ke dua desimal
-                                                                        $formatted_percentage_master = number_format($percentage, 0);
+                                                                        $formatted_percentage_master = number_format($percentage, 2);
 
                                                                         // Tampilkan hasil
                                                                         echo "{$formatted_percentage_master}%";
@@ -276,7 +294,7 @@
                                                                         $percentage = (($bruto_kg - $packing_kg) / $bruto_kg) * 100;
 
                                                                         // Format hasil ke dua desimal
-                                                                        $formatted_percentage_aktual = number_format($percentage, 0);
+                                                                        $formatted_percentage_aktual = number_format($percentage, 2);
 
                                                                         // Tampilkan hasil
                                                                         echo "{$formatted_percentage_aktual}%";
@@ -297,7 +315,7 @@
                                                                         $percentage = (($packing_kg - $kirim_kg) / $packing_kg) * 100;
 
                                                                         // Format hasil ke dua desimal
-                                                                        $formatted_percentage_kirim = number_format($percentage, 0);
+                                                                        $formatted_percentage_kirim = number_format($percentage, 2);
 
                                                                         // Tampilkan hasil
                                                                         echo "{$formatted_percentage_kirim}%";
