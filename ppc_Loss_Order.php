@@ -87,20 +87,23 @@
                                                             <th>NETTO (YD/MTR)</th>
                                                             <th>BRUTO (KG)</th>
                                                             <th>BRUTO (YD/MTR)</th>
+                                                            <th>TOTAL BRUTO (KG)</th>
+                                                            <th>TOTAL BRUTO (YD/MTR)</th>
                                                             <th>QTY PACKING(KG)</th>
                                                             <th>QTY PACKING(YD/MTR)</th>
                                                             <th>QTY GANTI KAIN(KG)</th>
                                                             <th>QTY GANTI KAIN(YD/MTR)</th>
-                                                            <th title="PENGAMBILAN LAPORAN PENGIRIMAN">QTY SUDAH KIRIM (KG)</th>
-                                                            <th title="PENGAMBILAN LAPORAN PENGIRIMAN">QTY SUDAH KIRIM (YD/MTR)</th>
+                                                            <th>QTY SUDAH KIRIM (KG)</th>
+                                                            <th>QTY SUDAH KIRIM (YD/MTR)</th>
+                                                            <th title="qty packing - qty kirim">QTY SELISIH KIRIM (KG)</th>
+                                                            <th title="qty packing - qty kirim">QTY SELISIH KIRIM (YD/MTR)</th>
                                                             <th>QTY BS (KG)</th>
                                                             <th>QTY BS (YD/MTR)</th>
                                                             <th>QTY SISA (KG)</th>
                                                             <th>QTY SISA (YD/MTR)</th>
                                                             <th>LOSS MASTER (KG)</th>
-                                                            <th>LOSS AKTUAL (KG)</th>
+                                                            <th title="(Total Qty Bruto - Qty Packing) / Total Qty Bruto * 100%">LOSS AKTUAL (KG)</th>
                                                             <th>LOSS KIRIM (KG)</th>
-                                                            <th>STATUS LOSS</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -252,12 +255,16 @@
                                                             </td>
                                                             <td align="right"><?= number_format($dt_bruto['BRUTO_KG'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_bruto['BRUTO_YD_MTR'], 2); ?></td>
+                                                            <td align="right"><?= number_format(str_replace(',', '', number_format($dt_bruto['BRUTO_KG'] + $dt_bagikain_salinan['SALINAN_KG'], 2)), 2); ?></td>
+                                                            <td align="right"><?= number_format(str_replace(',', '', number_format($dt_bruto['BRUTO_YD_MTR'] + $dt_bagikain_salinan['SALINAN_YD_MTR'], 2)), 2); ?></td>
                                                             <td align="right"><?= number_format($dt_packing['QTYPACKING_KG'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_packing['QTYPACKING_YD_MTR'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_bagikain_salinan['SALINAN_KG'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_bagikain_salinan['SALINAN_YD_MTR'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['QTY_SUDAH_KIRIM'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sum['QTY_SUDAH_KIRIM_2'], 2); ?></td>
+                                                            <td align="right"><?= number_format(str_replace(',', '', number_format($dt_packing['QTYPACKING_KG'] - $dt_sum['QTY_SUDAH_KIRIM'], 2)), 2); ?></td>
+                                                            <td align="right"><?= number_format(str_replace(',', '', number_format($dt_packing['QTYPACKING_YD_MTR'] - $dt_sum['QTY_SUDAH_KIRIM_2'], 2)), 2); ?></td>
                                                             <td align="right"><?= number_format($dt_bs['QTYBS_KG'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_bs['QTYBS_YD_MTR'], 2); ?></td>
                                                             <td align="right"><?= number_format($dt_sisa['QTYSISA_KG'], 2); ?></td>
@@ -286,12 +293,12 @@
                                                             <td align="right">
                                                                 <?php 
                                                                     $packing_kg = str_replace(',', '', number_format($dt_packing['QTYPACKING_KG'], 2));
-                                                                    $bruto_kg   = str_replace(',', '', number_format($dt_bruto['BRUTO_KG'], 2));
+                                                                    $Totalbruto_kg   = str_replace(',', '', number_format($dt_bruto['BRUTO_KG'] + $dt_packing['SALINAN_KG'], 2));
 
                                                                     // Pastikan netto tidak nol untuk menghindari pembagian dengan nol
-                                                                    if ($bruto_kg > 0 && $packing_kg > 0) {
+                                                                    if ($Totalbruto_kg > 0 && $packing_kg > 0) {
                                                                         // Hitung persentase
-                                                                        $percentage = (($bruto_kg - $packing_kg) / $bruto_kg) * 100;
+                                                                        $percentage = (($Totalbruto_kg - $packing_kg) / $Totalbruto_kg) * 100;
 
                                                                         // Format hasil ke dua desimal
                                                                         $formatted_percentage_aktual = number_format($percentage, 2);
@@ -325,23 +332,7 @@
                                                                     }
                                                                 ?>
                                                             </td>
-                                                            <td>
-                                                                <?php
-                                                                    if($error){
-                                                                        echo '';
-                                                                    }else{
-                                                                        if($formatted_percentage_master == $formatted_percentage_aktual){
-                                                                            echo "Pass";
-                                                                        }
-                                                                        if($formatted_percentage_master > $formatted_percentage_aktual){
-                                                                            echo "Untung";
-                                                                        }
-                                                                        if($formatted_percentage_master < $formatted_percentage_aktual){
-                                                                            echo "Rugi";
-                                                                        }
-                                                                    }
-                                                                ?>
-                                                            </td>
+                                                            
                                                         </tr>
                                                         <?php endwhile; ?>
                                                     </tbody>
