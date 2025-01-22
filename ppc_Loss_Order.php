@@ -198,15 +198,29 @@
                                                                 $q_bagikain_salinan     = db2_exec($conn1, $qty_bagikain_salinan);
                                                                 $dt_bagikain_salinan    = db2_fetch_assoc($q_bagikain_salinan);
 
-                                                                $qty_packing     = "SELECT
-                                                                                        SUM(USERPRIMARYQUANTITY) AS QTYPACKING_KG,
-                                                                                        SUM(USERSECONDARYQUANTITY) AS QTYPACKING_YD_MTR
-                                                                                    FROM
-                                                                                        STOCKTRANSACTION 
+                                                                $qty_packing     = "SELECT 
+                                                                                        SUM(QTYPACKING_KG) AS QTYPACKING_KG,
+                                                                                        SUM(QTYPACKING_YD_MTR) AS QTYPACKING_YD_MTR
+                                                                                    FROM (
+                                                                                        SELECT
+                                                                                            ITEMELEMENTCODE,
+                                                                                            QUALITYREASONCODE,
+                                                                                            (USERPRIMARYQUANTITY) AS QTYPACKING_KG,
+                                                                                            (USERSECONDARYQUANTITY) AS QTYPACKING_YD_MTR
+                                                                                        FROM
+                                                                                            STOCKTRANSACTION 
+                                                                                        WHERE
+                                                                                            LOGICALWAREHOUSECODE = 'M033'
+                                                                                            AND TEMPLATECODE = '303'
+                                                                                            AND PROJECTCODE = '$dt_sum[NO_ORDER]'
+                                                                                        GROUP BY 
+                                                                                            ITEMELEMENTCODE,
+                                                                                            QUALITYREASONCODE,
+                                                                                            USERPRIMARYQUANTITY,
+                                                                                            USERSECONDARYQUANTITY
+                                                                                        )
                                                                                     WHERE
-                                                                                        LOGICALWAREHOUSECODE = 'M033'
-                                                                                        AND TEMPLATECODE = '303'
-                                                                                        AND PROJECTCODE = '$dt_sum[NO_ORDER]'";
+	                                                                                    QUALITYREASONCODE IN ('SA', 'SD', 'SF', 'SG', 'SM', 'SP', 'SR', 'ST', '100') OR QUALITYREASONCODE IS NULL";
                                                                 $q_packing       = db2_exec($conn1, $qty_packing);
                                                                 $dt_packing      = db2_fetch_assoc($q_packing);
                                                                 
@@ -293,7 +307,7 @@
                                                             <td align="right">
                                                                 <?php 
                                                                     $packing_kg = str_replace(',', '', number_format($dt_packing['QTYPACKING_KG'], 2));
-                                                                    $Totalbruto_kg   = str_replace(',', '', number_format($dt_bruto['BRUTO_KG'] + $dt_packing['SALINAN_KG'], 2));
+                                                                    $Totalbruto_kg   = str_replace(',', '', number_format($dt_bruto['BRUTO_KG'] + $dt_bagikain_salinan['SALINAN_KG'], 2));
 
                                                                     // Pastikan netto tidak nol untuk menghindari pembagian dengan nol
                                                                     if ($Totalbruto_kg > 0 && $packing_kg > 0) {

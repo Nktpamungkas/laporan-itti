@@ -1,9 +1,27 @@
 <style>
-    table, th, td {
+    /* Gaya untuk tabel */
+    table {
         border: 1px solid black;
         border-collapse: collapse;
+        width: 100%; /* Sesuaikan lebar tabel dengan kontainer */
+    }
+
+    /* Gaya untuk header tabel */
+    th {
+        border: 1px solid black;
+        padding: 8px; /* Memberikan jarak di dalam sel */
+        text-align: center; /* Meluruskan teks ke tengah */
+        background-color: #f2f2f2; /* Memberikan warna latar belakang */
+    }
+
+    /* Gaya untuk sel tabel */
+    td {
+        border: 1px solid black;
+        padding: 8px; /* Memberikan jarak di dalam sel */
+        text-align: left; /* Meluruskan teks ke kiri */
     }
 </style>
+
 <center>
     <h3>Detail QTY KIRIM</h3>
     <table border="1">
