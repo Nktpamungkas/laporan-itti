@@ -82,6 +82,8 @@
                 if (!$exec_FOCPacking) {
                     die('Query execution failed: ' . db2_stmt_errormsg());
                 }
+                $totalQtyPackingKg = 0;
+                $totalQtyPackingYdMtr = 0;
             
                 while ($dt_FOCPacking = db2_fetch_assoc($exec_FOCPacking)) :
                 
@@ -90,10 +92,20 @@
                     <td><?= $dt_FOCPacking['PROJECTCODE']; ?></td>
                     <td><?= number_format($dt_FOCPacking['QTYPACKING_KG'], 2); ?></td>
                     <td><?= number_format($dt_FOCPacking['QTYPACKING_YD_MTR'], 2); ?></td>
+                    
+                    <?php $totalQtyPackingKg += (float) str_replace(',', '', $dt_FOCPacking['QTYPACKING_KG']); ?>
+                    <?php $totalQtyPackingYdMtr += (float) str_replace(',', '', $dt_FOCPacking['QTYPACKING_YD_MTR']); ?>
 
                 </tr>
              <?php endwhile; ?>
         </tbody>
+        <tfoot>
+            <tr style="background-color: #c9637f; font-weight: bold">
+                <td><b>Total</b></td>
+                <td><b><?= number_format($totalQtyPackingKg, 2); ?></b></td>
+                <td><b><?= number_format($totalQtyPackingYdMtr, 2); ?></b></td>
+            </tr>
+        </tfoot>
     </table>
 </center>
 
@@ -194,6 +206,8 @@
                 if (!$exec_FOCKirim) {
                     die('Query execution failed: ' . db2_stmt_errormsg());
                 }
+                $totalQtyKirimKg = 0;
+                $totalQtyKirimYdMtr = 0;
             
                 while ($dt_FOCKirim = db2_fetch_assoc($exec_FOCKirim)) :
                 
@@ -205,8 +219,17 @@
                     <td><?= number_format($dt_FOCKirim['QTY_SUDAH_KIRIM'], 2); ?></td>
                     <td><?= number_format($dt_FOCKirim['QTY_SUDAH_KIRIM_2'], 2); ?></td>
 
+                    <?php $totalQtyKirimKg += (float) str_replace(',', '', $dt_FOCKirim['QTY_SUDAH_KIRIM']); ?>
+                    <?php $totalQtyKirimYdMtr += (float) str_replace(',', '', $dt_FOCKirim['QTY_SUDAH_KIRIM_2']); ?>
                 </tr>
              <?php endwhile; ?>
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" style="background-color: #c9637f; font-weight: bold"><b>Total</b></td>
+                <td style="background-color: #c9637f; font-weight: bold"><b><?= number_format($totalQtyKirimKg, 2); ?></b></td>
+                <td style="background-color: #c9637f; font-weight: bold"><b><?= number_format($totalQtyKirimYdMtr, 2); ?></b></td>
+            </tr>
+        </tfoot>
     </table>
 </center>

@@ -23,7 +23,7 @@
 </style>
 
 <center>
-    <h3>Detail QTY AKJ</h3>
+    <h3>AKJ/ Potong Qty</h3>
     <table style="width:50%">
         <thead>
             <tr>
@@ -44,22 +44,22 @@
                 $exec_subcode   = db2_exec($conn1, $q_subcode);
                 $dt_subcode     = db2_fetch_assoc($exec_subcode);
 
-                $QueryDataMain          = "SELECT  
-                                        LISTAGG(DISTINCT '''' || TRIM(s.TRANSACTIONNUMBER) || '''', ', ') AS TRANSACTIONNUMBER
-                                    FROM
-                                        STOCKTRANSACTION s
-                                    WHERE
-                                        s.LOGICALWAREHOUSECODE = 'M031'
-                                        AND s.PROJECTCODE = '$no_order'
-                                        AND s.TEMPLATECODE = '313'
-                                        AND s.DECOSUBCODE01 = '$dt_subcode[SUBCODE01]'
-                                        AND s.DECOSUBCODE02 = '$dt_subcode[SUBCODE02]' 
-                                        AND s.DECOSUBCODE03 = '$dt_subcode[SUBCODE03]'
-                                        AND s.DECOSUBCODE04 = '$dt_subcode[SUBCODE04]'
-                                        AND s.DECOSUBCODE05 = '$dt_subcode[SUBCODE05]'
-                                        AND s.DECOSUBCODE06 = '$dt_subcode[SUBCODE06]'
-                                        AND s.DECOSUBCODE07 = '$dt_subcode[SUBCODE07]'
-                                        AND s.DECOSUBCODE08 = '$dt_subcode[SUBCODE08]'";
+                    $QueryDataMain          = "SELECT  
+                                                LISTAGG(DISTINCT '''' || TRIM(s.TRANSACTIONNUMBER) || '''', ', ') AS TRANSACTIONNUMBER
+                                            FROM
+                                                STOCKTRANSACTION s
+                                            WHERE
+                                                s.LOGICALWAREHOUSECODE = 'M031'
+                                                AND s.PROJECTCODE = '$no_order'
+                                                AND (s.TEMPLATECODE = '313' OR s.TEMPLATECODE = '098')
+                                                AND s.DECOSUBCODE01 = '$dt_subcode[SUBCODE01]'
+                                                AND s.DECOSUBCODE02 = '$dt_subcode[SUBCODE02]' 
+                                                AND s.DECOSUBCODE03 = '$dt_subcode[SUBCODE03]'
+                                                AND s.DECOSUBCODE04 = '$dt_subcode[SUBCODE04]'
+                                                AND s.DECOSUBCODE05 = '$dt_subcode[SUBCODE05]'
+                                                AND s.DECOSUBCODE06 = '$dt_subcode[SUBCODE06]'
+                                                AND s.DECOSUBCODE07 = '$dt_subcode[SUBCODE07]'
+                                                AND s.DECOSUBCODE08 = '$dt_subcode[SUBCODE08]'";
                 $DataMain   = db2_exec($conn1, $QueryDataMain);
                 $RowDataMain   = db2_fetch_assoc($DataMain);
 
@@ -78,7 +78,7 @@
                                             STOCKTRANSACTION s
                                         WHERE
                                             s.TRANSACTIONNUMBER IN ($transactionNumbers)  
-                                            AND s.TEMPLATECODE = '314'
+                                            AND  (s.TEMPLATECODE = '314' OR s.TEMPLATECODE = '098')
                                         GROUP BY
                                             s.PROJECTCODE,
                                             s.LOTCODE";

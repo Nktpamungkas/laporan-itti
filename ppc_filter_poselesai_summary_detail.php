@@ -103,6 +103,11 @@
                                         ASC";
 
                 $q_sum_po_selesai   = db2_exec($conn1, $query);
+                $totalQtyBagi = 0;
+                $totalQtySalinan = 0;
+                $totalRollKirim = 0;
+                $totalQtyKgKirim = 0;
+                $totalQtyYdMtrKirim = 0;
                 while ($dt_sum_detail = db2_fetch_assoc($q_sum_po_selesai)) :
                     $q_demand   = db2_exec($conn1, "SELECT 
                                                         PRODUCTIONDEMANDCODE
@@ -176,11 +181,13 @@
                         <?php if ($d_orig_pd_code['ORIGINALPDCODE']) : ?>
                             <?php if ($d_cek_salinan['SALINAN_058'] == '058') : ?>
                                 <?= number_format($d_qtybagikain['QTY_BAGIKAIN'], 2); ?>
+                                <?php $totalQtyBagi += $d_qtybagikain['QTY_BAGIKAIN']; ?>
                             <?php else : ?>
                                 0
                             <?php endif; ?>
                         <?php else : ?>
                             <?= number_format($d_qtybagikain['QTY_BAGIKAIN'], 2); ?>
+                            <?php $totalQtyBagi += $d_qtybagikain['QTY_BAGIKAIN']; ?>
                         <?php endif; ?>
                     </td>
                     <td>
@@ -189,6 +196,7 @@
                                 0
                             <?php else : ?>
                                 <?= number_format($d_qtysalinan['USERPRIMARYQUANTITY'], 3) ?>
+                                <?php $totalQtySalinan += $d_qtysalinan['USERPRIMARYQUANTITY']; ?>
                             <?php endif; ?>
                         <?php else : ?>
                             0
@@ -202,8 +210,23 @@
                     <td><?= $dt_sum_detail['SALESDOCUMENTPROVISIONALCODE'] ?></td>
                     <td><?= $dt_sum_detail['GOODSISSUEDATE'] ?></td>
 
+                    <?php $totalRollKirim += $d_roll_pengiriman['ROLL']; ?>
+                    <?php $totalQtyKgKirim += $dt_sum_detail['QTY_SUDAH_KIRIM']; ?>
+                    <?php $totalQtyYdMtrKirim += $dt_sum_detail['QTY_SUDAH_KIRIM_2']; ?>
+
                 </tr>
             <?php endwhile; ?>
         </tbody>
+        <tfoot>
+        <tr style="background-color: #c9637f; font-weight: bold">
+            <td colspan="3">Total</td>
+            <td><?= number_format($totalQtyBagi, 2); ?></td>
+            <td><?= number_format($totalQtySalinan, 3); ?></td>
+            <td><?= $totalRollKirim; ?></td>
+            <td><?= number_format($totalQtyKgKirim, 2); ?></td>
+            <td><?= number_format($totalQtyYdMtrKirim, 2); ?></td>
+            <td></td>
+            <td></td>
+        </tfoot>
     </table>
 </center>
