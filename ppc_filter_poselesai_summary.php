@@ -161,6 +161,8 @@
                                                             <th title="AMBIL DARI BALANCE">QTY READY (KG)</th>
                                                             <th title="AMBIL DARI BALANCE">QTY READY (YD/MTR)</th>
                                                             <th title="DELIVERY ACTUAL - TANGGAL HARI INI">DELAY</th>
+                                                            <th>LOSS MASTER (KG)</th>
+                                                            <th title="(Total Qty Bruto - Qty Packing) / Total Qty Bruto * 100%">LOSS AKTUAL (KG)</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -428,6 +430,48 @@
                                                             <?php $totalQtyPackingYdMtr += (float) str_replace(',', '', $dt_packing['QTYPACKING_YD_MTR']); ?>
                                                             <?php $totalQtySelisihKirimKg += (float) str_replace(',', '', $dt_packing['QTYPACKING_KG'] - $dt_sum['QTY_SUDAH_KIRIM']); ?>
                                                             <?php $totalQtySelisihKirimYdMtr += (float) str_replace(',', '', $dt_packing['QTYPACKING_YD_MTR'] - $dt_sum['QTY_SUDAH_KIRIM_2']); ?>
+                                                            <td align="right">
+                                                                <?php 
+                                                                    $bruto_kg = str_replace(',', '', number_format($dt_bruto['BRUTO_KG'], 2));
+                                                                    $netto_kg = str_replace(',', '', number_format($dt_sum['NETTO'], 2));
+
+                                                                    // Pastikan netto tidak nol untuk menghindari pembagian dengan nol
+                                                                    if ($netto_kg > 0 && $bruto_kg > 0) {
+                                                                        // Hitung persentase
+                                                                        $percentage = (($bruto_kg - $netto_kg) / $bruto_kg) * 100;
+
+                                                                        // Format hasil ke dua desimal
+                                                                        $formatted_percentage_master = number_format($percentage, 2);
+
+                                                                        // Tampilkan hasil
+                                                                        echo "{$formatted_percentage_master}%";
+                                                                    } else {
+                                                                        $error = "Qty tidak boleh nol.";
+                                                                        echo $error;
+                                                                    }
+                                                                ?>
+                                                            </td>
+                                                            <td align="right">
+                                                                <?php 
+                                                                    $packing_kg = str_replace(',', '', number_format($dt_packing['QTYPACKING_KG'], 2));
+                                                                    $Totalbruto_kg   = str_replace(',', '', number_format($dt_bruto['BRUTO_KG'] + $dt_bagikain_salinan['SALINAN_KG'], 2));
+
+                                                                    // Pastikan netto tidak nol untuk menghindari pembagian dengan nol
+                                                                    if ($Totalbruto_kg > 0 && $packing_kg > 0) {
+                                                                        // Hitung persentase
+                                                                        $percentage = (($Totalbruto_kg - $packing_kg) / $Totalbruto_kg) * 100;
+
+                                                                        // Format hasil ke dua desimal
+                                                                        $formatted_percentage_aktual = number_format($percentage, 2);
+
+                                                                        // Tampilkan hasil
+                                                                        echo "{$formatted_percentage_aktual}%";
+                                                                    } else {
+                                                                        $error = "Qty tidak boleh nol.";
+                                                                        echo $error;
+                                                                    }
+                                                                ?>
+                                                            </td>
                                                         </tr>
                                                         <?php endwhile; ?>
                                                     </tbody>
@@ -459,6 +503,8 @@
                                                             <td></td>
                                                             <td style="background-color: #eb9dae;"><b><?= number_format($totalQtySelisihKirimKg, 2); ?></b></td>
                                                             <td style="background-color: #eb9dae;"><b><?= number_format($totalQtySelisihKirimYdMtr, 2); ?></b></td>
+                                                            <td></td>
+                                                            <td></td>
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
