@@ -299,7 +299,8 @@
                                                                 $dt_bagikain_salinan    = db2_fetch_assoc($q_bagikain_salinan);
 
                                                                 $ResultLotCode  = "SELECT 
-                                                                                        LISTAGG('''' || TRIM(PRODUCTIONORDERCODE) || '''', ', ' ) AS PRODUCTIONORDERCODE
+                                                                                        LISTAGG('''' || TRIM(PRODUCTIONORDERCODE) || '''', ', ' ) AS PRODUCTIONORDERCODE,
+                                                                                        LISTAGG('''' || TRIM(PRODUCTIONDEMANDCODE) || '''', ', ' ) AS PRODUCTIONDEMANDCODE
                                                                                     FROM 
                                                                                         ITXVIEWKK
                                                                                     WHERE 
@@ -317,6 +318,7 @@
                                                                                             BALANCE b
                                                                                         WHERE
                                                                                             LOTCODE IN ($fetch_lotcode[PRODUCTIONORDERCODE])
+                                                                                            AND LEFT(ELEMENTSCODE, 8) IN ($fetch_lotcode[PRODUCTIONDEMANDCODE])
                                                                                             AND LOGICALWAREHOUSECODE = 'M031'
                                                                                             AND PROJECTCODE = '$dt_sum[NO_ORDER]'";
                                                                     $q_qty_ready   = db2_exec($conn1, $query);
@@ -362,7 +364,7 @@
                                                         <tr>
                                                             <td>
                                                                 <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><i class="icofont icofont-link"></i> Detail Qty Kirim</a><br>
-                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?PRODUCTIONORDERCODE=<?= $fetch_lotcode['PRODUCTIONORDERCODE'] ?>&no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>"><i class="icofont icofont-link"></i> Detail Qty Ready</a><br>
+                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?PRODUCTIONORDERCODE=<?= $fetch_lotcode['PRODUCTIONORDERCODE'] ?>&PRODUCTIONDEMANDCODE=<?= $fetch_lotcode['PRODUCTIONDEMANDCODE'] ?>&no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>"><i class="icofont icofont-link"></i> Detail Qty Ready</a><br>
                                                                 <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_selisih_kirim.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><i class="icofont icofont-link"></i> Detail Qty Selisih Kirim</a><br>
                                                                 <a target="_blank" class="link-opacity-10" href="https://online.indotaichen.com/laporan/ppc_filter.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>&kkoke="><i class="icofont icofont-link"></i> Detail Memo Penting</a><br>
                                                                 <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_foc_packing_kirim.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><i class="icofont icofont-link"></i> Detail Qty FOC Packing & Kirim</a><br>

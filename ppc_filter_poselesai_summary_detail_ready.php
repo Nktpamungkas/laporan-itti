@@ -49,6 +49,7 @@
                 $ket_product    = $_GET['ket_product'];
                 $no_warna       = $_GET['no_warna'];
                 $fetch_lotcode  = $_GET['PRODUCTIONORDERCODE'];
+                $fetch_demand   = $_GET['PRODUCTIONDEMANDCODE'];
 
                 $query          = "SELECT
                                         PROJECTCODE,
@@ -65,6 +66,7 @@
                                         -- AND TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) = '$ket_product' 
                                         -- AND TRIM(DECOSUBCODE05) = '$no_warna'
                                         LOTCODE IN ($fetch_lotcode)
+                                        AND SUBSTR(ELEMENTSCODE, 1,8) IN ($fetch_demand)
                                         AND LOGICALWAREHOUSECODE = 'M031'
                                         AND PROJECTCODE = '$no_order'
                                     GROUP BY
@@ -75,11 +77,14 @@
                                         DECOSUBCODE03
                                     ORDER BY
                                         LOTCODE ASC";
-
                 $q_sum_po_selesai   = db2_exec($conn1, $query);
-                while ($dt_sum_detail = db2_fetch_assoc($q_sum_po_selesai)) :
+                if (!$q_sum_po_selesai) {
+                    die("Query error: " . db2_stmt_errormsg()); // Menampilkan pesan error dari DB2
+                }
+                $hasData = false; // Flag untuk mengecek apakah ada data
+                while ($dt_sum_detail = db2_fetch_assoc($q_sum_po_selesai)) {
+                    $hasData = true; // Set true jika ada data
             ?>
-            
                 <tr>
                     <td><?= $dt_sum_detail['PROJECTCODE']; ?></td>
                     <td><?= $dt_sum_detail['LOTCODE']; ?></td>
@@ -95,7 +100,12 @@
                     <td><?= number_format($dt_sum_detail['QTY_READY'], 2); ?></td>
                     <td><?= number_format($dt_sum_detail['QTY_READY_2'], 2); ?></td>
                 </tr>
-            <?php endwhile; ?>
+            <?php } ?>
+            <?php if (!$hasData) { // Jika tidak ada data, tampilkan baris kosong dengan pesan ?>
+                <tr>
+                    <td colspan="8" style="text-align: center; font-weight: bold; color: red;">Tidak ada data ditemukan</td>
+                </tr>
+            <?php } ?>
         </tbody>
     </table>
 </center>
