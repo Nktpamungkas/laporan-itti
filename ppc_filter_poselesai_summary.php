@@ -124,8 +124,8 @@
                                 <?php if (isset($_POST['submit']) or ($_GET['demand'] and $_GET['prod_order'])) : ?>
                                     <div class="card">
                                         <div class="card-block">
-                                            <div class="dt-responsive table-responsive">
-                                                <table id="excel-LA" class="table table-striped table-bordered nowrap">
+                                            <div class="dt-responsive table-responsive" style="overflow-x: auto; overflow-y: auto; max-height: 400px;">
+                                                <table id="excel-LA" class="table table-striped table-bordered nowrap" style="overflow-x: auto; overflow-y: auto;">
                                                     <thead>
                                                         <tr>
                                                             <th>OPSI</th>
@@ -139,6 +139,7 @@
                                                             <th>WARNA</th>
                                                             <th>NO WARNA</th>
                                                             <th>DELIVERY ACTUAL</th>
+                                                            <th>TGL ESTIMASI PACKING</th>
                                                             <th>NETTO (KG)</th>
                                                             <th>NETTO (YD/MTR)</th>
                                                             <th>BRUTO (KG)</th>
@@ -196,6 +197,7 @@
                                                             $where_and = implode(" AND ", $wheres);
 
                                                             $q_sum_po_selesai   = db2_exec($conn1, "SELECT
+                                                                                                    LISTAGG(DISTINCT '''' || TRIM(p.CODE) || '''', ', ') AS PROUDUCTIONDEMANDCODE,
                                                                                                     isqd.ORDERLINE,
                                                                                                     isqd.PELANGGAN,
                                                                                                     TRIM(isqd.NO_ORDER) AS NO_ORDER,
@@ -232,6 +234,7 @@
                                                                                                     ITXVIEW_SUMMARY_QTY_DELIVERY isqd
                                                                                                 LEFT JOIN SALESORDER s ON s.CODE = isqd.NO_ORDER 
                                                                                                 LEFT JOIN ITXVIEW_PELANGGAN ip ON ip.ORDPRNCUSTOMERSUPPLIERCODE = s.ORDPRNCUSTOMERSUPPLIERCODE AND ip.CODE = s.CODE 
+                                                                                                LEFT JOIN PRODUCTIONDEMAND p ON p.ORIGDLVSALORDLINESALORDERCODE = isqd.NO_ORDER AND p.ORIGDLVSALORDERLINEORDERLINE = isqd.ORDERLINE 
                                                                                                 WHERE
                                                                                                     $where_and
                                                                                                 GROUP BY
@@ -362,14 +365,17 @@
                                                                     $q_packing       = db2_exec($conn1, $qty_packing);
                                                                     $dt_packing      = db2_fetch_assoc($q_packing);
                                                                 }
+
+                                                                $q_schedules_of_steps   = db2_exec($conn1, "SELECT HIGHESTFINALSCHEDULEDDATE FROM SCHEDULESOFSTEPS s WHERE CODE IN ($dt_sum[PROUDUCTIONDEMANDCODE]) AND FIRSTSCHEDULEDWORKCENTERCODE = 'P3IN3'");
+                                                                $d_schedules_of_steps   = db2_fetch_assoc($q_schedules_of_steps);
                                                         ?>
                                                         <tr>
                                                             <td>
-                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><i class="icofont icofont-link"></i> Detail Qty Kirim</a><br>
-                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?PRODUCTIONORDERCODE=<?= $fetch_lotcode['PRODUCTIONORDERCODE'] ?>&PRODUCTIONDEMANDCODE=<?= $fetch_lotcode['PRODUCTIONDEMANDCODE'] ?>&no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>"><i class="icofont icofont-link"></i> Detail Qty Ready</a><br>
-                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_selisih_kirim.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><i class="icofont icofont-link"></i> Detail Qty Selisih Kirim</a><br>
+                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>&PRODUCTIONORDERCODE=<?= $fetch_lotcode['PRODUCTIONORDERCODE'] ?>&PRODUCTIONDEMANDCODE=<?= $fetch_lotcode['PRODUCTIONDEMANDCODE'] ?>"><i class="icofont icofont-link"></i> Detail</a><br>
+                                                                <!-- <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_ready.php?PRODUCTIONORDERCODE=<?= $fetch_lotcode['PRODUCTIONORDERCODE'] ?>&PRODUCTIONDEMANDCODE=<?= $fetch_lotcode['PRODUCTIONDEMANDCODE'] ?>&no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>"><i class="icofont icofont-link"></i> Detail Qty Ready</a><br> -->
+                                                                <!-- <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_selisih_kirim.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><i class="icofont icofont-link"></i> Detail Qty Selisih Kirim</a><br> -->
                                                                 <a target="_blank" class="link-opacity-10" href="https://online.indotaichen.com/laporan/ppc_filter.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>&kkoke="><i class="icofont icofont-link"></i> Detail Memo Penting</a><br>
-                                                                <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_foc_packing_kirim.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><i class="icofont icofont-link"></i> Detail Qty FOC Packing & Kirim</a><br>
+                                                                <!-- <a target="_blank" class="link-opacity-10" href="ppc_filter_poselesai_summary_detail_foc_packing_kirim.php?no_order=<?= TRIM($dt_sum['NO_ORDER']); ?>&orderline=<?= $dt_sum['ORDERLINE']; ?>"><i class="icofont icofont-link"></i> Detail Qty FOC Packing & Kirim</a><br> -->
                                                             </td>
                                                             <td><?= $dt_sum['PELANGGAN']; ?></td>
                                                             <td><?= $dt_sum['NO_ORDER']; ?> - <?= $dt_sum['ORDERLINE']; ?></td>
@@ -381,6 +387,7 @@
                                                             <td><?= $dt_sum['WARNA']; ?></td>
                                                             <td><?= $dt_sum['NO_WARNA']; ?></td>
                                                             <td><?= $dt_sum['ACTUAL_DELIVERY']; ?></td>
+                                                            <td><?= $d_schedules_of_steps['HIGHESTFINALSCHEDULEDDATE']; ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO'], 2); ?></td>
                                                             <td align="right">
                                                                 <?php
@@ -413,7 +420,7 @@
                                                                 <?= number_format(
                                                                     ((trim($dt_sum['PRICEUNITOFMEASURECODE']) == 'm' ? $dt_sum['NETTO_M'] : $dt_sum['NETTO_2']) - $dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'])/$dt_sum['KONVERSI'], 2); ?>
 
-                                                            </td>
+                                                            </td><!-- QTY KURANG (KG) -->
                                                             <td align="right">
                                                                 <?= number_format(
                                                                     (trim($dt_sum['PRICEUNITOFMEASURECODE']) == 'm' ? $dt_sum['NETTO_M'] : $dt_sum['NETTO_2']) - $dt_sum['QTY_SUDAH_KIRIM_2']-$d_qty_ready['QTY_READY_2'], 2); ?>
@@ -580,8 +587,6 @@
                 });
             }
         }],
-        scrollY: '400px', // Scroll vertikal
-        scrollX: true, // Scroll horizontal
         scrollCollapse: true, // Mengaktifkan collapse pada scroll
         paging: false, // Menonaktifkan pagination
         fixedHeader: true // Menjaga header tetap terlihat saat scroll
