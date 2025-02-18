@@ -114,7 +114,6 @@
                                                                             ITXVIEW_SUMMARY_QTY_DELIVERY isqd
                                                                         LEFT JOIN SALESORDER s ON s.CODE = isqd.NO_ORDER 
                                                                         LEFT JOIN ITXVIEW_PELANGGAN ip ON ip.ORDPRNCUSTOMERSUPPLIERCODE = s.ORDPRNCUSTOMERSUPPLIERCODE AND ip.CODE = s.CODE 
-                                                                        LEFT JOIN PRODUCTIONDEMAND p ON p.ORIGDLVSALORDLINESALORDERCODE = isqd.NO_ORDER AND p.ORIGDLVSALORDERLINEORDERLINE = isqd.ORDERLINE 
                                                                         WHERE 
                                                                             NO_ORDER = '$no_order' 
                                                                             AND ORDERLINE = '$orderline' 

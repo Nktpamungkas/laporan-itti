@@ -197,7 +197,6 @@
                                                             $where_and = implode(" AND ", $wheres);
 
                                                             $q_sum_po_selesai   = db2_exec($conn1, "SELECT
-                                                                                                    LISTAGG(DISTINCT '''' || TRIM(p.CODE) || '''', ', ') AS PROUDUCTIONDEMANDCODE,
                                                                                                     isqd.ORDERLINE,
                                                                                                     isqd.PELANGGAN,
                                                                                                     TRIM(isqd.NO_ORDER) AS NO_ORDER,
@@ -234,7 +233,6 @@
                                                                                                     ITXVIEW_SUMMARY_QTY_DELIVERY isqd
                                                                                                 LEFT JOIN SALESORDER s ON s.CODE = isqd.NO_ORDER 
                                                                                                 LEFT JOIN ITXVIEW_PELANGGAN ip ON ip.ORDPRNCUSTOMERSUPPLIERCODE = s.ORDPRNCUSTOMERSUPPLIERCODE AND ip.CODE = s.CODE 
-                                                                                                LEFT JOIN PRODUCTIONDEMAND p ON p.ORIGDLVSALORDLINESALORDERCODE = isqd.NO_ORDER AND p.ORIGDLVSALORDERLINEORDERLINE = isqd.ORDERLINE 
                                                                                                 WHERE
                                                                                                     $where_and
                                                                                                 GROUP BY
@@ -276,6 +274,7 @@
                                                             $totalQtySelisihKirimYdMtr = 0;
                                                             while ($dt_sum = db2_fetch_assoc($q_sum_po_selesai)) :
                                                                 $qty_bruto  = "SELECT 
+                                                                                    LISTAGG(DISTINCT '''' || TRIM(CODE) || '''', ', ') AS PROUDUCTIONDEMANDCODE,
                                                                                     SUM(USERPRIMARYQUANTITY) AS BRUTO_KG,
                                                                                     SUM(USERSECONDARYQUANTITY) AS BRUTO_YD_MTR
                                                                                 FROM
@@ -366,7 +365,7 @@
                                                                     $dt_packing      = db2_fetch_assoc($q_packing);
                                                                 }
 
-                                                                $q_schedules_of_steps   = db2_exec($conn1, "SELECT HIGHESTFINALSCHEDULEDDATE FROM SCHEDULESOFSTEPS s WHERE CODE IN ($dt_sum[PROUDUCTIONDEMANDCODE]) AND FIRSTSCHEDULEDWORKCENTERCODE = 'P3IN3'");
+                                                                $q_schedules_of_steps   = db2_exec($conn1, "SELECT HIGHESTFINALSCHEDULEDDATE FROM SCHEDULESOFSTEPS s WHERE CODE IN ($dt_bruto[PROUDUCTIONDEMANDCODE]) AND FIRSTSCHEDULEDWORKCENTERCODE = 'P3IN3'");
                                                                 $d_schedules_of_steps   = db2_fetch_assoc($q_schedules_of_steps);
                                                         ?>
                                                         <tr>
