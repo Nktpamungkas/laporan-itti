@@ -444,9 +444,6 @@
                                                     
                                                     // Pastikan fetch_lotcode dan fetch_demand memiliki nilai sebelum query dijalankan
                                                     if (!empty($fetch_lotcode) && !empty($fetch_demand)) {
-                                                        // Hindari SQL Injection dengan menambahkan tanda kutip ke dalam IN()
-                                                        $lotcodes = implode(",", array_map(fn($code) => "'".trim($code)."'", explode(",", $fetch_lotcode)));
-                                                        $demands = implode(",", array_map(fn($code) => "'".trim($code)."'", explode(",", $fetch_demand)));
                                                     
                                                         $query_ready = "SELECT
                                                                             PROJECTCODE,
@@ -459,8 +456,8 @@
                                                                         FROM
                                                                             BALANCE b
                                                                         WHERE
-                                                                            LOTCODE IN ($lotcodes)
-                                                                            AND SUBSTR(ELEMENTSCODE, 1,8) IN ($demands)
+                                                                            LOTCODE IN ($fetch_lotcode)
+                                                                            AND SUBSTR(ELEMENTSCODE, 1,8) IN ($fetch_demand)
                                                                             AND LOGICALWAREHOUSECODE = 'M031'
                                                                             AND PROJECTCODE = '$no_order'
                                                                         GROUP BY
