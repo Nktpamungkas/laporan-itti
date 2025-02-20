@@ -435,71 +435,93 @@
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                    // $no_order       = $_GET['no_order'];
-                                                    $ket_product    = $_GET['ket_product'];
-                                                    $no_warna       = $_GET['no_warna'];
-                                                    $fetch_lotcode  = $_GET['PRODUCTIONORDERCODE'];
-                                                    $fetch_demand   = $_GET['PRODUCTIONDEMANDCODE'];
-
-                                                    $query_ready          = "SELECT
-                                                                                PROJECTCODE,
-                                                                                LOTCODE,
-                                                                                SUBSTR(ELEMENTSCODE, 1,8) AS PRODUCTIONDEMAND,
-                                                                                TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) KET_PRODUCT,
-                                                                                COUNT(ELEMENTSCODE) AS ROLL,
-                                                                                SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
-                                                                                SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
-                                                                            FROM
-                                                                                BALANCE b
-                                                                            WHERE
-                                                                                LOTCODE IN ($fetch_lotcode)
-                                                                                AND SUBSTR(ELEMENTSCODE, 1,8) IN ($fetch_demand)
-                                                                                AND LOGICALWAREHOUSECODE = 'M031'
-                                                                                AND PROJECTCODE = '$no_order'
-                                                                            GROUP BY
-                                                                                PROJECTCODE,
-                                                                                LOTCODE,
-                                                                                SUBSTR(ELEMENTSCODE, 1,8),
-                                                                                DECOSUBCODE02,
-                                                                                DECOSUBCODE03
-                                                                            ORDER BY
-                                                                                LOTCODE ASC";
-                                                    $q_ready   = db2_exec($conn1, $query_ready);
-                                                    if (!$q_ready) {
-                                                        die("Query ready error: " . db2_stmt_errormsg()); // Menampilkan pesan error dari DB2
-                                                    }
-                                                    $hasData = false; // Flag untuk mengecek apakah ada data
-                                                    $totalRollQtyReady = 0;
-                                                    $totalQtyReady = 0;
-                                                    $totalQtyReady_2 = 0;
-                                                    while ($dt_sum_detail_ready = db2_fetch_assoc($q_ready)) {
-                                                        $hasData = true; // Set true jika ada data
-                                                ?>
-                                                    <tr>
-                                                        <td><?= $dt_sum_detail_ready['PROJECTCODE']; ?></td>
-                                                        <td><?= $dt_sum_detail_ready['LOTCODE']; ?></td>
-                                                        <td>
-                                                            <a target="_BLANK" title="Posisi KK" style="font-size: 11px; text-align: center; text-decoration: underline;" href="http://online.indotaichen.com/laporan/ppc_filter_steps.php?demand=<?= $dt_sum_detail['PRODUCTIONDEMAND']; ?>&prod_order=<?= $dt_sum_detail['LOTCODE']; ?>">
-                                                                <?= $dt_sum_detail_ready['PRODUCTIONDEMAND']; ?>
-                                                            </a>
-                                                        </td> <!-- DEMAND -->
-                                                        <td><?= $dt_sum_detail_ready['KET_PRODUCT'] ?></td>
-                                                        <td><?= $no_warna; ?></td>
-
-                                                        <td><?= number_format($dt_sum_detail_ready['ROLL'], 0); ?></td>
-                                                        <td><?= number_format($dt_sum_detail_ready['QTY_READY'], 2); ?></td>
-                                                        <td><?= number_format($dt_sum_detail_ready['QTY_READY_2'], 2); ?></td>
-
-                                                        <?php $totalRollQtyReady    += number_format($dt_sum_detail_ready['ROLL'], 0);  ?>
-                                                        <?php $totalQtyReady        += number_format($dt_sum_detail_ready['QTY_READY'], 2);  ?>
-                                                        <?php $totalQtyReady_2      += number_format($dt_sum_detail_ready['QTY_READY_2'], 2);  ?>
-                                                    </tr>
-                                                <?php } ?>
-                                                <?php if (!$hasData) { // Jika tidak ada data, tampilkan baris kosong dengan pesan ?>
-                                                    <tr>
-                                                        <td colspan="8" style="text-align: center; font-weight: bold; color: red;">Tidak ada data ditemukan</td>
-                                                    </tr>
-                                                <?php } ?>
+                                                    // Ambil nilai dari GET dan pastikan aman
+                                                    $ket_product    = isset($_GET['ket_product']) ? htmlspecialchars($_GET['ket_product']) : null;
+                                                    $no_warna       = isset($_GET['no_warna']) ? htmlspecialchars($_GET['no_warna']) : null;
+                                                    $fetch_lotcode  = isset($_GET['PRODUCTIONORDERCODE']) ? $_GET['PRODUCTIONORDERCODE'] : null;
+                                                    $fetch_demand   = isset($_GET['PRODUCTIONDEMANDCODE']) ? $_GET['PRODUCTIONDEMANDCODE'] : null;
+                                                    $no_order       = isset($_GET['no_order']) ? htmlspecialchars($_GET['no_order']) : null;
+                                                    
+                                                    // Pastikan fetch_lotcode dan fetch_demand memiliki nilai sebelum query dijalankan
+                                                    if (!empty($fetch_lotcode) && !empty($fetch_demand)) {
+                                                        // Hindari SQL Injection dengan menambahkan tanda kutip ke dalam IN()
+                                                        $lotcodes = implode(",", array_map(fn($code) => "'".trim($code)."'", explode(",", $fetch_lotcode)));
+                                                        $demands = implode(",", array_map(fn($code) => "'".trim($code)."'", explode(",", $fetch_demand)));
+                                                    
+                                                        $query_ready = "SELECT
+                                                                            PROJECTCODE,
+                                                                            LOTCODE,
+                                                                            SUBSTR(ELEMENTSCODE, 1,8) AS PRODUCTIONDEMAND,
+                                                                            TRIM(DECOSUBCODE02) || '-' || TRIM(DECOSUBCODE03) KET_PRODUCT,
+                                                                            COUNT(ELEMENTSCODE) AS ROLL,
+                                                                            SUM(BASEPRIMARYQUANTITYUNIT) AS QTY_READY,
+                                                                            SUM(BASESECONDARYQUANTITYUNIT) AS QTY_READY_2
+                                                                        FROM
+                                                                            BALANCE b
+                                                                        WHERE
+                                                                            LOTCODE IN ($lotcodes)
+                                                                            AND SUBSTR(ELEMENTSCODE, 1,8) IN ($demands)
+                                                                            AND LOGICALWAREHOUSECODE = 'M031'
+                                                                            AND PROJECTCODE = '$no_order'
+                                                                        GROUP BY
+                                                                            PROJECTCODE,
+                                                                            LOTCODE,
+                                                                            SUBSTR(ELEMENTSCODE, 1,8),
+                                                                            DECOSUBCODE02,
+                                                                            DECOSUBCODE03
+                                                                        ORDER BY
+                                                                            LOTCODE ASC";
+                                                    
+                                                        $q_ready = db2_exec($conn1, $query_ready);
+                                                        
+                                                        if (!$q_ready) {
+                                                            die("Query ready error: " . db2_stmt_errormsg($conn1)); // Menampilkan pesan error dari DB2
+                                                        }
+                                                    
+                                                        $hasData = false; // Flag untuk mengecek apakah ada data
+                                                        $totalRollQtyReady = 0;
+                                                        $totalQtyReady = 0;
+                                                        $totalQtyReady_2 = 0;
+                                                    
+                                                        while ($dt_sum_detail_ready = db2_fetch_assoc($q_ready)) {
+                                                            $hasData = true; // Set true jika ada data
+                                                    ?>
+                                                            <tr>
+                                                                <td><?= htmlspecialchars($dt_sum_detail_ready['PROJECTCODE']); ?></td>
+                                                                <td><?= htmlspecialchars($dt_sum_detail_ready['LOTCODE']); ?></td>
+                                                                <td>
+                                                                    <a target="_blank" title="Posisi KK" style="font-size: 11px; text-align: center; text-decoration: underline;" 
+                                                                       href="http://online.indotaichen.com/laporan/ppc_filter_steps.php?demand=<?= urlencode($dt_sum_detail_ready['PRODUCTIONDEMAND']); ?>&prod_order=<?= urlencode($dt_sum_detail_ready['LOTCODE']); ?>">
+                                                                        <?= htmlspecialchars($dt_sum_detail_ready['PRODUCTIONDEMAND']); ?>
+                                                                    </a>
+                                                                </td> <!-- DEMAND -->
+                                                                <td><?= htmlspecialchars($dt_sum_detail_ready['KET_PRODUCT']) ?></td>
+                                                                <td><?= htmlspecialchars($no_warna); ?></td>
+                                                    
+                                                                <td><?= number_format($dt_sum_detail_ready['ROLL'] ?? 0, 0); ?></td>
+                                                                <td><?= number_format($dt_sum_detail_ready['QTY_READY'] ?? 0, 2); ?></td>
+                                                                <td><?= number_format($dt_sum_detail_ready['QTY_READY_2'] ?? 0, 2); ?></td>
+                                                    
+                                                                <?php 
+                                                                    $totalRollQtyReady += $dt_sum_detail_ready['ROLL'] ?? 0;
+                                                                    $totalQtyReady += $dt_sum_detail_ready['QTY_READY'] ?? 0;
+                                                                    $totalQtyReady_2 += $dt_sum_detail_ready['QTY_READY_2'] ?? 0;
+                                                                ?>
+                                                            </tr>
+                                                    <?php 
+                                                        } // End while
+                                                    } else { ?>
+                                                        <tr>
+                                                            <td colspan="8" style="text-align: center; font-weight: bold; color: red;">Data tidak tersedia</td>
+                                                        </tr>
+                                                    <?php } ?>
+                                                    
+                                                    <?php if (!$hasData) { // Jika tidak ada data, tampilkan baris kosong dengan pesan ?>
+                                                        <tr>
+                                                            <td colspan="8" style="text-align: center; font-weight: bold; color: red;">Tidak ada data ditemukan</td>
+                                                        </tr>
+                                                    <?php } ?>
+                                                    
                                                 <tr>
                                                     <td></td>
                                                     <td></td>

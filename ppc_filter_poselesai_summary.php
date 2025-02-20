@@ -365,8 +365,41 @@
                                                                     $dt_packing      = db2_fetch_assoc($q_packing);
                                                                 }
 
-                                                                $q_schedules_of_steps   = db2_exec($conn1, "SELECT HIGHESTFINALSCHEDULEDDATE FROM SCHEDULESOFSTEPS s WHERE CODE IN ($dt_bruto[PROUDUCTIONDEMANDCODE]) AND FIRSTSCHEDULEDWORKCENTERCODE = 'P3IN3'");
-                                                                $d_schedules_of_steps   = db2_fetch_assoc($q_schedules_of_steps);
+                                                                // Pastikan data ada dan tidak kosong
+                                                                if (empty($dt_bruto['PROUDUCTIONDEMANDCODE'])) {
+                                                                    error_log("Warning: PROUDUCTIONDEMANDCODE kosong.");
+                                                                    $highestFinalScheduledDate = ''; // Tetap lanjutkan dengan data kosong
+                                                                } else {
+                                                                    // Bersihkan dan format data agar sesuai untuk SQL
+                                                                    $codesArray = array_filter((array) $dt_bruto['PROUDUCTIONDEMANDCODE']); // Hapus nilai kosong
+
+                                                                    if (!empty($codesArray)) {
+                                                                        $codes = implode(",", array_map(fn($code) => "'" . trim($code) . "'", $codesArray));
+
+                                                                        $query = "SELECT HIGHESTFINALSCHEDULEDDATE 
+                                                                                FROM SCHEDULESOFSTEPS 
+                                                                                WHERE CODE IN ($codes) 
+                                                                                AND FIRSTSCHEDULEDWORKCENTERCODE = 'P3IN3'";
+
+                                                                        // Debugging: tampilkan query sebelum dieksekusi (opsional)
+                                                                        error_log("Debug Query: " . $query);
+
+                                                                        $q_schedules_of_steps = @db2_exec($conn1, $query); // Tambahkan '@' untuk suppress error
+
+                                                                        // Cek jika query gagal
+                                                                        if (!$q_schedules_of_steps) {
+                                                                        // error_log("Query gagal: " . db2_stmt_errormsg($conn1));
+                                                                            $highestFinalScheduledDate = ''; // Tetap lanjutkan dengan data kosong
+                                                                        } else {
+                                                                            // Ambil hasil query
+                                                                            $d_schedules_of_steps = db2_fetch_assoc($q_schedules_of_steps) ?? [];
+                                                                            $highestFinalScheduledDate = $d_schedules_of_steps['HIGHESTFINALSCHEDULEDDATE'] ?? '';
+                                                                        }
+                                                                    } else {
+                                                                        error_log("Warning: Tidak ada kode yang valid untuk query.");
+                                                                        $highestFinalScheduledDate = '';
+                                                                    }
+                                                                }
                                                         ?>
                                                         <tr>
                                                             <td>
@@ -386,7 +419,7 @@
                                                             <td><?= $dt_sum['WARNA']; ?></td>
                                                             <td><?= $dt_sum['NO_WARNA']; ?></td>
                                                             <td><?= $dt_sum['ACTUAL_DELIVERY']; ?></td>
-                                                            <td><?= $d_schedules_of_steps['HIGHESTFINALSCHEDULEDDATE']; ?></td>
+                                                            <td><?= $highestFinalScheduledDate ?: ""; ?></td>
                                                             <td align="right"><?= number_format($dt_sum['NETTO'], 2); ?></td>
                                                             <td align="right">
                                                                 <?php
