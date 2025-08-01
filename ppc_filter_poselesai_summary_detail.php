@@ -91,7 +91,7 @@
                                                     $query          = "SELECT DISTINCT
                                                                             SALESDOCUMENTPROVISIONALCODE,
                                                                             GOODSISSUEDATE,
-                                                                            LOTCODE,
+                                                                            LISTAGG(DISTINCT TRIM(LOTCODE), ', ') AS LOTCODE,
                                                                             ORDERLINE,
                                                                             PELANGGAN,
                                                                             NO_ORDER,
@@ -121,7 +121,6 @@
                                                                         GROUP BY
                                                                             SALESDOCUMENTPROVISIONALCODE,
                                                                             GOODSISSUEDATE,
-                                                                            LOTCODE,
                                                                             ORDERLINE,
                                                                             PELANGGAN,
                                                                             NO_ORDER,
