@@ -88,10 +88,66 @@
 
                                                     $no_order       = $_GET['no_order'];
                                                     $orderline      = $_GET['orderline'];
-                                                    $query          = "SELECT DISTINCT
+                                                    $query          = "WITH FINALDATA AS (
+                                                                            SELECT DISTINCT
+                                                                                SALESDOCUMENTPROVISIONALCODE,
+                                                                                GOODSISSUEDATE,
+                                                                                LISTAGG(DISTINCT TRIM(LOTCODE), ', ') AS LOTCODE,
+                                                                                ORDERLINE,
+                                                                                PELANGGAN,
+                                                                                NO_ORDER,
+                                                                                NO_PO,
+                                                                                KET_PRODUCT,
+                                                                                STYLE,
+                                                                                LEBAR,
+                                                                                GRAMASI,
+                                                                                WARNA,
+                                                                                NO_WARNA,
+                                                                                NETTO,
+                                                                                SATUAN_NETTO,
+                                                                                NETTO_2,
+                                                                                SATUAN_NETTO_2,
+                                                                                KONVERSI,
+                                                                                ACTUAL_DELIVERY,
+                                                                                QTY_SUDAH_KIRIM,
+                                                                                QTY_SUDAH_KIRIM_2
+                                                                            FROM 
+                                                                                ITXVIEW_SUMMARY_QTY_DELIVERY isqd
+                                                                            LEFT JOIN SALESORDER s ON s.CODE = isqd.NO_ORDER 
+                                                                            LEFT JOIN ITXVIEW_PELANGGAN ip ON ip.ORDPRNCUSTOMERSUPPLIERCODE = s.ORDPRNCUSTOMERSUPPLIERCODE AND ip.CODE = s.CODE 
+                                                                            WHERE 
+                                                                                NO_ORDER = '$no_order' 
+                                                                                AND ORDERLINE = '$orderline' 
+                                                                                AND NOT QUALITYREASONCODE = 'FOC'
+                                                                            GROUP BY
+                                                                                SALESDOCUMENTPROVISIONALCODE,
+                                                                                GOODSISSUEDATE,
+                                                                                ORDERLINE,
+                                                                                PELANGGAN,
+                                                                                NO_ORDER,
+                                                                                NO_PO,
+                                                                                KET_PRODUCT,
+                                                                                STYLE,
+                                                                                LEBAR,
+                                                                                GRAMASI,
+                                                                                WARNA,
+                                                                                NO_WARNA,
+                                                                                NETTO,
+                                                                                SATUAN_NETTO,
+                                                                                NETTO_2,
+                                                                                SATUAN_NETTO_2,
+                                                                                KONVERSI,
+                                                                                ACTUAL_DELIVERY,
+                                                                                QTY_SUDAH_KIRIM,
+                                                                                QTY_SUDAH_KIRIM_2
+                                                                            ORDER BY 
+                                                                                SALESDOCUMENTPROVISIONALCODE 
+                                                                                ASC
+                                                                        )
+                                                                        SELECT
                                                                             SALESDOCUMENTPROVISIONALCODE,
                                                                             GOODSISSUEDATE,
-                                                                            LISTAGG(DISTINCT TRIM(LOTCODE), ', ') AS LOTCODE,
+                                                                            LOTCODE,
                                                                             ORDERLINE,
                                                                             PELANGGAN,
                                                                             NO_ORDER,
@@ -110,17 +166,12 @@
                                                                             ACTUAL_DELIVERY,
                                                                             SUM(QTY_SUDAH_KIRIM) AS QTY_SUDAH_KIRIM,
                                                                             SUM(QTY_SUDAH_KIRIM_2) AS QTY_SUDAH_KIRIM_2
-                                                                        FROM 
-                                                                            ITXVIEW_SUMMARY_QTY_DELIVERY isqd
-                                                                        LEFT JOIN SALESORDER s ON s.CODE = isqd.NO_ORDER 
-                                                                        LEFT JOIN ITXVIEW_PELANGGAN ip ON ip.ORDPRNCUSTOMERSUPPLIERCODE = s.ORDPRNCUSTOMERSUPPLIERCODE AND ip.CODE = s.CODE 
-                                                                        WHERE 
-                                                                            NO_ORDER = '$no_order' 
-                                                                            AND ORDERLINE = '$orderline' 
-                                                                            AND NOT QUALITYREASONCODE = 'FOC'
-                                                                        GROUP BY
+                                                                        FROM
+                                                                            FINALDATA
+                                                                        GROUP BY 
                                                                             SALESDOCUMENTPROVISIONALCODE,
                                                                             GOODSISSUEDATE,
+                                                                            LOTCODE,
                                                                             ORDERLINE,
                                                                             PELANGGAN,
                                                                             NO_ORDER,
@@ -136,10 +187,7 @@
                                                                             NETTO_2,
                                                                             SATUAN_NETTO_2,
                                                                             KONVERSI,
-                                                                            ACTUAL_DELIVERY
-                                                                        ORDER BY 
-                                                                            SALESDOCUMENTPROVISIONALCODE 
-                                                                            ASC";
+                                                                            ACTUAL_DELIVERY";
 
                                                     $q_sum_po_selesai   = db2_exec($conn1, $query);
                                                     $totalQtyBagi = 0;
