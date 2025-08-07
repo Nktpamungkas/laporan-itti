@@ -94,6 +94,8 @@
                                                                                 GOODSISSUEDATE,
                                                                                 LISTAGG(DISTINCT TRIM(LOTCODE), ', ') AS LOTCODE,
                                                                                 ORDERLINE,
+                                                                                LINENUMBER,
+                                                                                ITEMELEMENTCODE,
                                                                                 PELANGGAN,
                                                                                 NO_ORDER,
                                                                                 NO_PO,
@@ -122,7 +124,9 @@
                                                                             GROUP BY
                                                                                 SALESDOCUMENTPROVISIONALCODE,
                                                                                 GOODSISSUEDATE,
+                                                                                ITEMELEMENTCODE,
                                                                                 ORDERLINE,
+                                                                                LINENUMBER,
                                                                                 PELANGGAN,
                                                                                 NO_ORDER,
                                                                                 NO_PO,
@@ -273,7 +277,7 @@
                                                                     0
                                                                 <?php endif; ?>
                                                             <?php else : ?>
-                                                                <?= number_format($d_qtybagikain['QTY_BAGIKAIN'], 2); ?>
+                                                                <?= number_format($d_qtybagikain['QTY_BAGIKAIN']?? 0, 2); ?>
                                                                 <?php $totalQtyBagi += $d_qtybagikain['QTY_BAGIKAIN']; ?>
                                                             <?php endif; ?>
                                                         </td>
@@ -540,7 +544,7 @@
                                                                     </a>
                                                                 </td> <!-- DEMAND -->
                                                                 <td><?= htmlspecialchars($dt_sum_detail_ready['KET_PRODUCT']) ?></td>
-                                                                <td><?= htmlspecialchars($no_warna); ?></td>
+                                                                <td><?= htmlspecialchars($no_warna ?? ''); ?></td>
                                                     
                                                                 <td><?= number_format($dt_sum_detail_ready['ROLL'] ?? 0, 0); ?></td>
                                                                 <td><?= number_format($dt_sum_detail_ready['QTY_READY'] ?? 0, 2); ?></td>
@@ -763,11 +767,11 @@
                                                     <tr>
                                                         <td><?= $dt_sum_detail['PROJECTCODE']; ?></td>
                                                         <td><?= $dt_sum_detail['LOTCODE']; ?></td>
-                                                        <td><?= number_format($dt_sum_detail['QTY_KG'], 2); ?></td>
-                                                        <td><?= number_format($dt_sum_detail['QTY_YD_MTR'], 2); ?></td>
+                                                        <td><?= number_format($dt_sum_detail['QTY_KG']?? 0 , 2); ?></td>
+                                                        <td><?= number_format($dt_sum_detail['QTY_YD_MTR']?? 0, 2); ?></td>
                                                     </tr>
-                                                    <?php $totalQtyKg += (float) str_replace(',', '', $dt_sum_detail['QTY_KG']); ?>
-                                                    <?php $totalQtyYdMtr += (float) str_replace(',', '', $dt_sum_detail['QTY_YD_MTR']); ?>
+                                                    <?php $totalQtyKg += (float) str_replace(',', '', $dt_sum_detail['QTY_KG']?? 0); ?>
+                                                    <?php $totalQtyYdMtr += (float) str_replace(',', '', $dt_sum_detail['QTY_YD_MTR']?? 0); ?>
                                                 <?php } }else { ?>
                                                     <tr>
                                                         <td colspan="4" style="text-align: center; font-weight: bold; color: red;">Tidak ada data ditemukan</td>
@@ -777,8 +781,8 @@
                                             <tfoot>
                                                 <tr style="background-color: #c9637f; font-weight: bold">
                                                     <td colspan="2" style="text-align: center;">Total</td>
-                                                    <td><?= number_format($totalQtyKg, 2); ?></td>
-                                                    <td><?= number_format($totalQtyYdMtr, 2); ?></td>
+                                                    <td><?= number_format($totalQtyKg??0, 2); ?></td>
+                                                    <td><?= number_format($totalQtyYdMtr??0, 2); ?></td>
                                                 </tr>
                                             </tfoot>
                                         </table>
