@@ -27,10 +27,109 @@
     <link rel="stylesheet" type="text/css" href="files\bower_components\datatables.net-bs4\css\dataTables.bootstrap4.min.css">
     <link rel="stylesheet" type="text/css" href="files\assets\pages\data-table\css\buttons.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="files\bower_components\datatables.net-responsive-bs4\css\responsive.bootstrap4.min.css">
+    <style>
+        #migration-alert-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 24, 40, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 1200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #migration-alert-overlay.migration-alert-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .migration-alert-card {
+            background: #111b2b;
+            color: #fefefe;
+            padding: 2rem;
+            max-width: 480px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(7, 11, 20, 0.6);
+            text-align: center;
+        }
+        .migration-alert-card h3 {
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-size: 14px;
+            color: #8ad1ff;
+        }
+        .migration-alert-card p {
+            margin: 0.5rem 0 1.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .migration-alert-card button {
+            border: none;
+            background: #ffb347;
+            color: #111b2b;
+            font-weight: 600;
+            padding: 0.85rem 1.75rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .migration-alert-card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+        .migration-alert-detail {
+            font-size: 0.85rem;
+            color: #c2d3ff;
+        }
+    </style>
 </head>
 <?php require_once 'header.php'; ?>
 
 <body>
+    <div id="migration-alert-overlay" class="migration-alert-hidden" data-storage-key="migration-alert-ppc-filter">
+        <div class="migration-alert-card">
+            <h3>Perhatian</h3>
+            <p>Halaman ini akan segera dinonaktifkan dan dipindahkan ke <strong>app.indotaichen.com</strong> sesuai hasil sosialisasi.</p>
+            <p class="migration-alert-detail">Terima kasih atas pengertiannya.</p>
+            <button type="button" data-migration-dismiss>Dimengerti</button>
+        </div>
+    </div>
+    <script>
+        (function () {
+            var overlay = document.getElementById('migration-alert-overlay');
+            if (!overlay) {
+                return;
+            }
+            var storageKey = overlay.dataset.storageKey || 'migration-alert-default';
+            var dismissBtn = overlay.querySelector('[data-migration-dismiss]');
+            function hide(setKey) {
+                overlay.classList.remove('migration-alert-visible');
+                overlay.classList.add('migration-alert-hidden');
+                overlay.setAttribute('aria-hidden', 'true');
+                if (setKey) {
+                    localStorage.setItem(storageKey, '1');
+                }
+            }
+            document.addEventListener('DOMContentLoaded', function () {
+                if (!localStorage.getItem(storageKey)) {
+                    overlay.classList.remove('migration-alert-hidden');
+                    overlay.classList.add('migration-alert-visible');
+                    overlay.setAttribute('aria-hidden', 'false');
+                } else {
+                    overlay.setAttribute('aria-hidden', 'true');
+                }
+            });
+            if (dismissBtn) {
+                dismissBtn.addEventListener('click', function () {
+                    hide(true);
+                });
+            }
+        })();
+    </script>
     <div class="pcoded-content">
         <div class="pcoded-inner-content">
             <div class="main-body">
